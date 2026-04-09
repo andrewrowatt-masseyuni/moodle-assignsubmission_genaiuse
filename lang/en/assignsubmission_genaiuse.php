@@ -85,6 +85,6 @@ $string['privacy:metadata:tablepurpose'] = 'Stores the generative AI use declara
 $string['privacy:path'] = 'Generative AI Use Statement';
 $string['supportingevidence'] = 'Generative AI use statement - supporting evidence';
 $string['supportingevidence_text1'] = '1. Ensure you have saved your drafts, version history, etc., so that you can produce it if your course coordinator requires it.';
-$string['supportingevidence_text2'] = '2. Complete the information in the following blocks (page 3), or as required by your course coordinator, for each tool. Add additional blocks as needed.';
+$string['supportingevidence_text2'] = '2. Download the template below and complete each section or as directed by your course coordinator, for each tool. Add additional sections as needed.';
 $string['toolusetemplate'] = 'Tool use template';
 $string['toolusetemplate_help'] = 'Upload an optional Word document template that students can download when completing their generative AI use statement.';
