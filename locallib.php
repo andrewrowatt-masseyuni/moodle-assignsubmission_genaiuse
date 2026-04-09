@@ -349,10 +349,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->hideIf('genaiuse_evidence_filemanager', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Conditional validation: require AI detail fields only when AI is used.
-        $mform->addFormRule(function($values) use ($requiredrule) {
+        $mform->addFormRule(function ($values) use ($requiredrule) {
             $errors = [];
-            if (isset($values['genaiuse_aiused'])
-                    && (int)$values['genaiuse_aiused'] === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
+            if (
+                isset($values['genaiuse_aiused'])
+                    && (int)$values['genaiuse_aiused'] === ASSIGNSUBMISSION_GENAIUSE_AI_USED
+            ) {
                 if (empty(trim($values['genaiuse_aitoolsused'] ?? ''))) {
                     $errors['genaiuse_aitoolsused'] = $requiredrule;
                 }
