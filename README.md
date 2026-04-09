@@ -1,3 +1,4 @@
+[![Moodle Plugin CI](https://github.com/andrewrowatt-masseyuni/moodle-assignsubmission_genaiuse/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/andrewrowatt-masseyuni/moodle-assignsubmission_genaiuse/actions/workflows/moodle-ci.yml)
 # Generative AI Use Statement (assignsubmission_genaiuse)
 
 An assignment submission plugin for Moodle that requires students to declare whether they used generative AI tools when completing their assignment.
