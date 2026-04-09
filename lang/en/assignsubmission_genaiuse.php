@@ -71,6 +71,9 @@ $string['ai_ack_5'] = 'To assist with maintaining academic integrity, I have app
 $string['ai_ack_6'] = 'I acknowledge that any undeclared use of generative AI will constitute academic dishonesty and will be dealt with according to relevant University policy.';
 $string['ai_ack_7'] = 'I understand that I will be held accountable for any academic misconduct that arises in breach of any relevant University policy, as well as the consequences of such infringements.';
 
+// Validation.
+$string['fieldrequired'] = 'This field is required. Use N/A if this field is not applicable.';
+
 // Supporting evidence section.
 $string['supportingevidence'] = 'Generative AI use statement - supporting evidence';
 

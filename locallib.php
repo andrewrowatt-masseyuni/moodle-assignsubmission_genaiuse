@@ -232,7 +232,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aitoolsused', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_tools', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aitoolsused', PARAM_TEXT);
+        $mform->addRule('genaiuse_aitoolsused', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        $mform->disabledIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Field 2: AI use context.
         $prefix2group = [];
@@ -245,7 +247,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aiusecontext', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_context', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aiusecontext', PARAM_TEXT);
+        $mform->addRule('genaiuse_aiusecontext', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        $mform->disabledIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Field 3: AI content description.
         $prefix3group = [];
@@ -258,7 +262,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aicontentdesc', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_content', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aicontentdesc', PARAM_TEXT);
+        $mform->addRule('genaiuse_aicontentdesc', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        $mform->disabledIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Field 4: AI modification.
         $prefix4group = [];
@@ -271,10 +277,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aimodification', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_modification', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aimodification', PARAM_TEXT);
+        $mform->addRule('genaiuse_aimodification', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        $mform->disabledIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Acknowledgement paragraphs (7 items as numbered list).
-        $ackhtml = \html_writer::start_tag('ol');
+        $ackhtml = \html_writer::start_tag('ol', ['class'=> 'genaiuse_acknowledgement']);
         for ($i = 1; $i <= 7; $i++) {
             $ackhtml .= \html_writer::tag('li', get_string('ai_ack_' . $i, 'assignsubmission_genaiuse'));
         }
@@ -438,7 +446,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 get_string('ai_prefix_modification', 'assignsubmission_genaiuse') . ' '
                 . \html_writer::tag('strong', s($record->aimodification)));
 
-            $result .= \html_writer::start_tag('ol');
+            $result .= \html_writer::start_tag('ol', ['class'=> 'genaiuse_acknowledgement']);
             for ($i = 1; $i <= 7; $i++) {
                 $result .= \html_writer::tag('li', get_string('ai_ack_' . $i, 'assignsubmission_genaiuse'));
             }
