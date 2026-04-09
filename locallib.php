@@ -161,8 +161,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      * @return bool
      */
     public function save_settings(stdClass $data) {
-        $this->set_config('maxevidencefiles', $data->assignsubmission_genaiuse_maxfiles);
-        $this->set_config('maxsubmissionsizebytes', $data->assignsubmission_genaiuse_maxbytes);
+        if (isset($data->assignsubmission_genaiuse_maxfiles)) {
+            $this->set_config('maxevidencefiles', $data->assignsubmission_genaiuse_maxfiles);
+        }
+        if (isset($data->assignsubmission_genaiuse_maxbytes)) {
+            $this->set_config('maxsubmissionsizebytes', $data->assignsubmission_genaiuse_maxbytes);
+        }
         return true;
     }
 
@@ -187,7 +191,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $existingrecord = $this->get_genaiuse_submission($submission->id);
         }
 
-        // --- Radio buttons: No AI Used / AI Used ---
+        // Radio buttons: No AI Used / AI Used.
+
         $mform->addElement(
             'radio',
             'genaiuse_aiused',
@@ -196,7 +201,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED
         );
 
-        // --- "No AI Used" declaration (visible when aiused == 0) ---
+        // Declaration text visible when aiused == 0.
         $noaidecl = '';
         $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname));
         $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'));
@@ -226,9 +231,11 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->setDefault('genaiuse_aiused', ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
         }
 
-        // --- "AI Used" form fields (visible when aiused == 1) ---
+        // Form fields visible when aiused == 1.
 
         global $OUTPUT;
+
+        $requiredrule = get_string('fieldrequired', 'assignsubmission_genaiuse');
 
         // Field 1: AI tools used.
         $prefix1group = [];
@@ -245,7 +252,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aitoolsused', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_tools', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aitoolsused', PARAM_TEXT);
-        $mform->addRule('genaiuse_aitoolsused', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -264,7 +270,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aiusecontext', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_context', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aiusecontext', PARAM_TEXT);
-        $mform->addRule('genaiuse_aiusecontext', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -283,7 +288,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aicontentdesc', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_content', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aicontentdesc', PARAM_TEXT);
-        $mform->addRule('genaiuse_aicontentdesc', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -302,7 +306,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addElement('textarea', 'genaiuse_aimodification', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_modification', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aimodification', PARAM_TEXT);
-        $mform->addRule('genaiuse_aimodification', get_string('fieldrequired', 'assignsubmission_genaiuse'), 'required', null, 'client');
         $mform->hideIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -318,7 +321,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addGroup($ackgroup, 'genaiuse_ai_ack_group', '', '', false);
         $mform->hideIf('genaiuse_ai_ack_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        // --- Supporting evidence file upload (visible when aiused == 1) ---
+        // Supporting evidence file upload (visible when aiused == 1).
         $evidenceheadergroup = [];
         $evidenceheadergroup[] = $mform->createElement(
             'static',
@@ -344,6 +347,27 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $mform->addElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
         $mform->hideIf('genaiuse_evidence_filemanager', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+
+        // Conditional validation: require AI detail fields only when AI is used.
+        $mform->addFormRule(function($values) use ($requiredrule) {
+            $errors = [];
+            if (isset($values['genaiuse_aiused'])
+                    && (int)$values['genaiuse_aiused'] === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
+                if (empty(trim($values['genaiuse_aitoolsused'] ?? ''))) {
+                    $errors['genaiuse_aitoolsused'] = $requiredrule;
+                }
+                if (empty(trim($values['genaiuse_aiusecontext'] ?? ''))) {
+                    $errors['genaiuse_aiusecontext'] = $requiredrule;
+                }
+                if (empty(trim($values['genaiuse_aicontentdesc'] ?? ''))) {
+                    $errors['genaiuse_aicontentdesc'] = $requiredrule;
+                }
+                if (empty(trim($values['genaiuse_aimodification'] ?? ''))) {
+                    $errors['genaiuse_aimodification'] = $requiredrule;
+                }
+            }
+            return empty($errors) ? true : $errors;
+        });
 
         return true;
     }
