@@ -36,7 +36,6 @@ define('ASSIGNSUBMISSION_GENAIUSE_AI_USED', 1);
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assign_submission_genaiuse extends assign_submission_plugin {
-
     /**
      * Get the name of this plugin.
      *
@@ -189,8 +188,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
 
         // --- Radio buttons: No AI Used / AI Used ---
-        $mform->addElement('radio', 'genaiuse_aiused', get_string('pluginname', 'assignsubmission_genaiuse'),
-            get_string('noaiused', 'assignsubmission_genaiuse'), ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
+        $mform->addElement(
+            'radio',
+            'genaiuse_aiused',
+            get_string('pluginname', 'assignsubmission_genaiuse'),
+            get_string('noaiused', 'assignsubmission_genaiuse'),
+            ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED
+        );
 
         // --- "No AI Used" declaration (visible when aiused == 0) ---
         $noaidecl = '';
@@ -203,8 +207,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addGroup($noaigroup, 'genaiuse_noai_group', '', '', false);
         $mform->hideIf('genaiuse_noai_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
 
-        $mform->addElement('radio', 'genaiuse_aiused', '',
-            get_string('aiused', 'assignsubmission_genaiuse'), ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        $mform->addElement(
+            'radio',
+            'genaiuse_aiused',
+            '',
+            get_string('aiused', 'assignsubmission_genaiuse'),
+            ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
 
         // Set default/existing value.
         if ($existingrecord) {
@@ -223,9 +232,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // Field 1: AI tools used.
         $prefix1group = [];
-        $prefix1group[] = $mform->createElement('static', 'genaiuse_ai_prefix1', '',
+        $prefix1group[] = $mform->createElement(
+            'static',
+            'genaiuse_ai_prefix1',
+            '',
             \html_writer::tag('span', get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname))
-            . $OUTPUT->help_icon('genaiuse_aitoolsused', 'assignsubmission_genaiuse'));
+            . $OUTPUT->help_icon('genaiuse_aitoolsused', 'assignsubmission_genaiuse')
+        );
         $mform->addGroup($prefix1group, 'genaiuse_ai_prefix1_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix1_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -238,9 +251,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // Field 2: AI use context.
         $prefix2group = [];
-        $prefix2group[] = $mform->createElement('static', 'genaiuse_ai_prefix2', '',
+        $prefix2group[] = $mform->createElement(
+            'static',
+            'genaiuse_ai_prefix2',
+            '',
             \html_writer::tag('span', get_string('ai_prefix_context', 'assignsubmission_genaiuse'))
-            . $OUTPUT->help_icon('genaiuse_aiusecontext', 'assignsubmission_genaiuse'));
+            . $OUTPUT->help_icon('genaiuse_aiusecontext', 'assignsubmission_genaiuse')
+        );
         $mform->addGroup($prefix2group, 'genaiuse_ai_prefix2_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix2_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -253,9 +270,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // Field 3: AI content description.
         $prefix3group = [];
-        $prefix3group[] = $mform->createElement('static', 'genaiuse_ai_prefix3', '',
+        $prefix3group[] = $mform->createElement(
+            'static',
+            'genaiuse_ai_prefix3',
+            '',
             \html_writer::tag('span', get_string('ai_prefix_content', 'assignsubmission_genaiuse'))
-            . $OUTPUT->help_icon('genaiuse_aicontentdesc', 'assignsubmission_genaiuse'));
+            . $OUTPUT->help_icon('genaiuse_aicontentdesc', 'assignsubmission_genaiuse')
+        );
         $mform->addGroup($prefix3group, 'genaiuse_ai_prefix3_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix3_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -268,9 +289,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // Field 4: AI modification.
         $prefix4group = [];
-        $prefix4group[] = $mform->createElement('static', 'genaiuse_ai_prefix4', '',
+        $prefix4group[] = $mform->createElement(
+            'static',
+            'genaiuse_ai_prefix4',
+            '',
             \html_writer::tag('span', get_string('ai_prefix_modification', 'assignsubmission_genaiuse'))
-            . $OUTPUT->help_icon('genaiuse_aimodification', 'assignsubmission_genaiuse'));
+            . $OUTPUT->help_icon('genaiuse_aimodification', 'assignsubmission_genaiuse')
+        );
         $mform->addGroup($prefix4group, 'genaiuse_ai_prefix4_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix4_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -282,7 +307,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->disabledIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Acknowledgement paragraphs (7 items as numbered list).
-        $ackhtml = \html_writer::start_tag('ol', ['class'=> 'genaiuse_acknowledgement']);
+        $ackhtml = \html_writer::start_tag('ol', ['class' => 'genaiuse_acknowledgement']);
         for ($i = 1; $i <= 7; $i++) {
             $ackhtml .= \html_writer::tag('li', get_string('ai_ack_' . $i, 'assignsubmission_genaiuse'));
         }
@@ -295,8 +320,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // --- Supporting evidence file upload (visible when aiused == 1) ---
         $evidenceheadergroup = [];
-        $evidenceheadergroup[] = $mform->createElement('static', 'genaiuse_evidence_header_text', '',
-            \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse')));
+        $evidenceheadergroup[] = $mform->createElement(
+            'static',
+            'genaiuse_evidence_header_text',
+            '',
+            \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'))
+        );
         $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '', false);
         $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -433,20 +462,28 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $result .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'));
             $result .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'));
         } else {
-            $result .= \html_writer::tag('p',
+            $result .= \html_writer::tag(
+                'p',
                 get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname) . ' '
-                . \html_writer::tag('strong', s($record->aitoolsused)));
-            $result .= \html_writer::tag('p',
+                . \html_writer::tag('strong', s($record->aitoolsused))
+            );
+            $result .= \html_writer::tag(
+                'p',
                 get_string('ai_prefix_context', 'assignsubmission_genaiuse') . ' '
-                . \html_writer::tag('strong', s($record->aiusecontext)));
-            $result .= \html_writer::tag('p',
+                . \html_writer::tag('strong', s($record->aiusecontext))
+            );
+            $result .= \html_writer::tag(
+                'p',
                 get_string('ai_prefix_content', 'assignsubmission_genaiuse') . ' '
-                . \html_writer::tag('strong', s($record->aicontentdesc)));
-            $result .= \html_writer::tag('p',
+                . \html_writer::tag('strong', s($record->aicontentdesc))
+            );
+            $result .= \html_writer::tag(
+                'p',
                 get_string('ai_prefix_modification', 'assignsubmission_genaiuse') . ' '
-                . \html_writer::tag('strong', s($record->aimodification)));
+                . \html_writer::tag('strong', s($record->aimodification))
+            );
 
-            $result .= \html_writer::start_tag('ol', ['class'=> 'genaiuse_acknowledgement']);
+            $result .= \html_writer::start_tag('ol', ['class' => 'genaiuse_acknowledgement']);
             for ($i = 1; $i <= 7; $i++) {
                 $result .= \html_writer::tag('li', get_string('ai_ack_' . $i, 'assignsubmission_genaiuse'));
             }
@@ -493,8 +530,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      */
     public function delete_instance() {
         global $DB;
-        $DB->delete_records('assignsubmission_genaiuse',
-            ['assignment' => $this->assignment->get_instance()->id]);
+        $DB->delete_records(
+            'assignsubmission_genaiuse',
+            ['assignment' => $this->assignment->get_instance()->id]
+        );
         return true;
     }
 

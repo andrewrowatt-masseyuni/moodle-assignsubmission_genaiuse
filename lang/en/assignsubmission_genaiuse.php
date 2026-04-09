@@ -25,11 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Generative AI use statement';
-$string['enabled'] = 'Generative AI use statement';
-$string['enabled_help'] = 'If enabled, students must declare whether or not they used generative AI tools in the completion of their submission.';
 $string['default'] = 'Enabled by default';
 $string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
+$string['enabled'] = 'Generative AI use statement';
+$string['enabled_help'] = 'If enabled, students must declare whether or not they used generative AI tools in the completion of their submission.';
+$string['pluginname'] = 'Generative AI use statement';
 
 // Radio button labels.
 $string['noaiused'] = 'No AI Used';
