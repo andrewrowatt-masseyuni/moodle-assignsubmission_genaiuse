@@ -11,3 +11,14 @@
 #fgroup_id_genaiuse_ai_prefix4_group + .fitem {
     padding-top: 0;
 }
+
+.alert.assignsubmission_genaiuse {
+    a {
+        font-weight: 400;
+        text-decoration: underline;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+}
