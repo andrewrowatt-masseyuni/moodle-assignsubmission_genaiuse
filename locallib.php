@@ -733,6 +733,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      */
     public function view_header() {
         $presubmissioninformation = get_config('assignsubmission_genaiuse', 'presubmissioninformation');
-        return $presubmissioninformation ? "<div class=\"alert alert-info assignsubmission_genaiuse\">$presubmissioninformation</div>" : '';
+        return $presubmissioninformation ?
+        "<div class=\"alert alert-info assignsubmission_genaiuse\">$presubmissioninformation</div>" : '';
     }
 }
