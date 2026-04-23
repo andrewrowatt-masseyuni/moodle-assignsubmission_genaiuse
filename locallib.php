@@ -191,6 +191,27 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addHelpButton('assignsubmission_genaiuse_maxbytes', 'maxbytes', 'assignsubmission_genaiuse');
         $mform->setDefault('assignsubmission_genaiuse_maxbytes', $defaultmaxbytes);
         $mform->hideIf('assignsubmission_genaiuse_maxbytes', 'assignsubmission_genaiuse_enabled', 'notchecked');
+
+        // Per-assignment: enable OneDrive link field on the submission form.
+        $defaultonedrive = $this->assignment->has_instance()
+            ? $this->get_config('onedrivelinkenabled')
+            : 0;
+        $mform->addElement(
+            'selectyesno',
+            'assignsubmission_genaiuse_onedrivelink',
+            get_string('onedrivelink_enabled', 'assignsubmission_genaiuse')
+        );
+        $mform->addHelpButton(
+            'assignsubmission_genaiuse_onedrivelink',
+            'onedrivelink_enabled',
+            'assignsubmission_genaiuse'
+        );
+        $mform->setDefault('assignsubmission_genaiuse_onedrivelink', $defaultonedrive);
+        $mform->hideIf(
+            'assignsubmission_genaiuse_onedrivelink',
+            'assignsubmission_genaiuse_enabled',
+            'notchecked'
+        );
     }
 
     /**
@@ -205,6 +226,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
         if (isset($data->assignsubmission_genaiuse_maxbytes)) {
             $this->set_config('maxsubmissionsizebytes', $data->assignsubmission_genaiuse_maxbytes);
+        }
+        if (isset($data->assignsubmission_genaiuse_onedrivelink)) {
+            $this->set_config('onedrivelinkenabled', $data->assignsubmission_genaiuse_onedrivelink);
         }
         return true;
     }
@@ -278,6 +302,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $data->genaiuse_aiusecontext = $existingrecord->aiusecontext ?? '';
             $data->genaiuse_aicontentdesc = $existingrecord->aicontentdesc ?? '';
             $data->genaiuse_aimodification = $existingrecord->aimodification ?? '';
+            $data->genaiuse_onedrivelink = $existingrecord->onedrivelink ?? '';
         } else {
             // Use a value that matches neither radio button so nothing is pre-selected.
             $mform->setDefault('genaiuse_aiused', -1);
@@ -426,6 +451,43 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $mform->addElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
 
+        // Optional OneDrive link field — only visible when enabled on the assignment.
+        if (!empty($this->get_config('onedrivelinkenabled'))) {
+            $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
+            $onedriveelements = [];
+            $onedriveelements[] = $mform->createElement(
+                'text',
+                'genaiuse_onedrivelink',
+                '',
+                ['size' => 60]
+            );
+            if (!empty($assistanceurl)) {
+                $onedriveelements[] = $mform->createElement(
+                    'static',
+                    'genaiuse_onedrivelink_assistance',
+                    '',
+                    \html_writer::link(
+                        $assistanceurl,
+                        get_string('onedriveassistance_link', 'assignsubmission_genaiuse'),
+                        ['target' => '_blank', 'rel' => 'noopener noreferrer']
+                    )
+                );
+            }
+            $mform->addGroup(
+                $onedriveelements,
+                'genaiuse_onedrivelink_group',
+                get_string('onedrivelink', 'assignsubmission_genaiuse'),
+                ' ',
+                false
+            );
+            $mform->setType('genaiuse_onedrivelink', PARAM_URL);
+            $mform->addHelpButton(
+                'genaiuse_onedrivelink_group',
+                'onedrivelink',
+                'assignsubmission_genaiuse'
+            );
+        }
+
         // Conditional validation: require AI detail fields only when AI is used.
         $mform->addFormRule(function ($values) use ($requiredrule) {
             $errors = [];
@@ -492,6 +554,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
 
         $record->numfiles = $this->count_files($submission->id);
+
+        if (!empty($this->get_config('onedrivelinkenabled'))) {
+            $link = trim((string)($data->genaiuse_onedrivelink ?? ''));
+            $record->onedrivelink = $link === '' ? null : $link;
+        } else {
+            $record->onedrivelink = null;
+        }
 
         if ($currentsubmission) {
             $record->id = $currentsubmission->id;
@@ -615,6 +684,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             }
         }
 
+        if (!empty($record->onedrivelink)) {
+            $result .= \html_writer::tag(
+                'p',
+                get_string('onedrivelink', 'assignsubmission_genaiuse') . ': '
+                    . \html_writer::link($record->onedrivelink, s($record->onedrivelink))
+            );
+        }
+
         return $result;
     }
 
@@ -718,22 +795,40 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'genaiuse_aiusecontext' => new external_value(PARAM_TEXT, 'AI use context.', VALUE_OPTIONAL),
             'genaiuse_aicontentdesc' => new external_value(PARAM_TEXT, 'AI content description.', VALUE_OPTIONAL),
             'genaiuse_aimodification' => new external_value(PARAM_TEXT, 'AI output modification.', VALUE_OPTIONAL),
+            'genaiuse_onedrivelink' => new external_value(PARAM_URL, 'OneDrive link to final submission.', VALUE_OPTIONAL),
         ];
     }
 
     /**
      * Return HTML to display in the view assignment page.
      *
-     * Returns the site-wide pre-submission information
-     * or guidance configured by the administrator,
-     * or an empty string if none has been set.
-     * This is displayed on mod/assign/view/php.
+     * Returns the site-wide pre-submission information configured by the
+     * administrator and, when OneDrive is enabled for this assignment, the
+     * site-wide OneDrive recommendation. Returns an empty string if neither
+     * produces any content. Displayed on mod/assign/view.php.
      *
      * @return string
      */
     public function view_header() {
-        $presubmissioninformation = get_config('assignsubmission_genaiuse', 'presubmissioninformation');
-        return $presubmissioninformation ?
-        "<div class=\"alert alert-info assignsubmission_genaiuse\">$presubmissioninformation</div>" : '';
+        global $OUTPUT;
+
+        $presubmissioninformation = (string)get_config('assignsubmission_genaiuse', 'presubmissioninformation');
+
+        $recommendation = '';
+        if (!empty($this->get_config('onedrivelinkenabled'))) {
+            $recommendation = (string)get_config('assignsubmission_genaiuse', 'onedriverecommendation');
+        }
+
+        if ($presubmissioninformation === '' && $recommendation === '') {
+            return '';
+        }
+
+        $context = [
+            'haspresubmissioninformation' => $presubmissioninformation !== '',
+            'presubmissioninformation' => $presubmissioninformation,
+            'hasonedriverecommendation' => $recommendation !== '',
+            'onedriverecommendation' => $recommendation,
+        ];
+        return $OUTPUT->render_from_template('assignsubmission_genaiuse/view_header', $context);
     }
 }

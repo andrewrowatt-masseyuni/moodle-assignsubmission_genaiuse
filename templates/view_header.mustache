@@ -1,0 +1,43 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template assignsubmission_genaiuse/view_header
+
+    Renders the assignsubmission_genaiuse view header shown on the assignment
+    view page: the site-wide pre-submission information and, when enabled for
+    the assignment, the site-wide OneDrive recommendation.
+
+    Context variables required for this template:
+    * haspresubmissioninformation - bool, true when presubmissioninformation is non-empty.
+    * presubmissioninformation - string (raw HTML), site-wide pre-submission information.
+    * hasonedriverecommendation - bool, true when onedriverecommendation is non-empty.
+    * onedriverecommendation - string (raw HTML), site-wide OneDrive recommendation.
+
+    Example context (json):
+    {
+        "haspresubmissioninformation": true,
+        "presubmissioninformation": "<p>Read the pre-submission guidance.</p>",
+        "hasonedriverecommendation": true,
+        "onedriverecommendation": "<p>You are encouraged to create and develop your assignment using OneDrive.</p>"
+    }
+}}
+{{#haspresubmissioninformation}}
+    <div class="alert alert-info assignsubmission_genaiuse">{{{presubmissioninformation}}}</div>
+{{/haspresubmissioninformation}}
+{{#hasonedriverecommendation}}
+    <div class="alert alert-info assignsubmission_genaiuse_onedrive">{{{onedriverecommendation}}}</div>
+{{/hasonedriverecommendation}}

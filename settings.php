@@ -70,3 +70,20 @@ $settings->add(new admin_setting_configstoredfile(
     0,
     ['accepted_types' => ['.docx']]
 ));
+
+// OneDrive assistance URL.
+$settings->add(new admin_setting_configtext(
+    'assignsubmission_genaiuse/onedriveassistance',
+    new lang_string('onedriveassistance', 'assignsubmission_genaiuse'),
+    new lang_string('onedriveassistance_help', 'assignsubmission_genaiuse'),
+    '',
+    PARAM_URL
+));
+
+// OneDrive recommendation (rich text) shown on the assignment view page when enabled.
+$settings->add(new admin_setting_confightmleditor(
+    'assignsubmission_genaiuse/onedriverecommendation',
+    new lang_string('onedriverecommendation', 'assignsubmission_genaiuse'),
+    new lang_string('onedriverecommendation_help', 'assignsubmission_genaiuse'),
+    new lang_string('onedriverecommendation_default', 'assignsubmission_genaiuse')
+));

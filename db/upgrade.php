@@ -15,18 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for Generative AI use statement
+ * Upgrade steps for assignsubmission_genaiuse.
  *
  * @package    assignsubmission_genaiuse
  * @copyright  2026 Andrew Rowatt <A.J.Rowatt@massey.ac.nz>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Run upgrade steps.
+ *
+ * @param int $oldversion
+ * @return bool
+ */
+function xmldb_assignsubmission_genaiuse_upgrade($oldversion) {
+    global $DB;
 
-$plugin->component    = 'assignsubmission_genaiuse';
-$plugin->release      = '1.0';
-$plugin->version      = 2026042301;
-$plugin->requires     = 2024100700;
-$plugin->supported    = [405, 405];
-$plugin->maturity     = MATURITY_STABLE;
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2026042301) {
+        $table = new xmldb_table('assignsubmission_genaiuse');
+        $field = new xmldb_field('onedrivelink', XMLDB_TYPE_CHAR, '1333', null, null, null, null, 'numfiles');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026042301, 'assignsubmission', 'genaiuse');
+    }
+
+    return true;
+}
