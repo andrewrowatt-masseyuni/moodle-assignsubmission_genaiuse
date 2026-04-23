@@ -35,8 +35,8 @@ Feature: Basic tests for Generative AI use statement
   Scenario: No AI use option is selected by default on a new submission
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
-    Then the "checked" attribute of "#id_genaiuse_aiused_0" "css_element" should not be set
-    And the "checked" attribute of "#id_genaiuse_aiused_1" "css_element" should not be set
+    Then the "checked" attribute of "#id_genaiuse_aiused_1" "css_element" should not be set
+    And the "checked" attribute of "#id_genaiuse_aiused_0" "css_element" should not be set
     And I should not see "I acknowledge that any undeclared use of generative AI"
     And I should not see "When using AI, I have ensured that the work produced"
 
@@ -57,7 +57,7 @@ Feature: Basic tests for Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
     And I set the field "Online text" to "This is my submission text with AI assistance."
-    And I click on "#id_genaiuse_aiused_0" "css_element"
+    And I click on "#id_genaiuse_aiused_1" "css_element"
     And I set the field "genaiuse_aitoolsused" to "ChatGPT (https://chat.openai.com)"
     And I set the field "genaiuse_aiusecontext" to "brainstorming ideas and generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "an outline structure and sample paragraphs"
@@ -83,7 +83,7 @@ Feature: Basic tests for Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     And I press "Add submission"
     And I set the field "Online text" to "My submission with AI help."
-    And I click on "#id_genaiuse_aiused_0" "css_element"
+    And I click on "#id_genaiuse_aiused_1" "css_element"
     And I set the field "genaiuse_aitoolsused" to "ChatGPT"
     And I set the field "genaiuse_aiusecontext" to "generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "sample paragraphs"
