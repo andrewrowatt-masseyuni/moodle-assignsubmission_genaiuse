@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/assign/submission/genaiuse/db" VERSION="20260408" COMMENT="XMLDB file for Moodle mod/assign/submission/genaiuse/db"
+<XMLDB PATH="mod/assign/submission/genaiuse/db" VERSION="20260423" COMMENT="XMLDB file for Moodle mod/assign/submission/genaiuse/db"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -15,6 +15,7 @@
         <FIELD NAME="aicontentdesc" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of content used in task from AI tools."/>
         <FIELD NAME="aimodification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="How the AI output was modified."/>
         <FIELD NAME="numfiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of supporting evidence files."/>
+        <FIELD NAME="onedrivelink" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false" COMMENT="Optional OneDrive link to the student's final submission."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this record."/>
