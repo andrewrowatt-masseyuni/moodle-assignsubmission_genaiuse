@@ -92,7 +92,6 @@ $settings->add(new admin_setting_confightmleditor(
     PARAM_RAW,
     '',
     '20'
-    
 ));
 
 // Tool use template (optional Word document).
