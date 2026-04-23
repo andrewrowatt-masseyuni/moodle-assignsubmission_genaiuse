@@ -42,5 +42,14 @@ function xmldb_assignsubmission_genaiuse_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026042301, 'assignsubmission', 'genaiuse');
     }
 
+    if ($oldversion < 2026042302) {
+        $table = new xmldb_table('assignsubmission_genaiuse');
+        $field = new xmldb_field('tooluse', XMLDB_TYPE_TEXT, null, null, null, null, null, 'onedrivelink');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026042302, 'assignsubmission', 'genaiuse');
+    }
+
     return true;
 }

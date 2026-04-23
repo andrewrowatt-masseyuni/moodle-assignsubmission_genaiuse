@@ -16,6 +16,7 @@
         <FIELD NAME="aimodification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="How the AI output was modified."/>
         <FIELD NAME="numfiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of supporting evidence files."/>
         <FIELD NAME="onedrivelink" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false" COMMENT="Optional OneDrive link to the student's final submission."/>
+        <FIELD NAME="tooluse" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Richtext description of generative AI tool use entered directly in the submission form."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this record."/>
