@@ -254,22 +254,22 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $existingrecord = $this->get_genaiuse_submission($submission->id);
         }
 
-        // Radio buttons: No AI Used / AI Used.
+        // Radio buttons: AI Used / No AI Used.
 
         $radioarray = [];
         $radioarray[] = $mform->createElement(
             'radio',
             'genaiuse_aiused',
             '',
-            get_string('noaiused', 'assignsubmission_genaiuse'),
-            ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED
+            get_string('aiused', 'assignsubmission_genaiuse'),
+            ASSIGNSUBMISSION_GENAIUSE_AI_USED
         );
         $radioarray[] = $mform->createElement(
             'radio',
             'genaiuse_aiused',
             '',
-            get_string('aiused', 'assignsubmission_genaiuse'),
-            ASSIGNSUBMISSION_GENAIUSE_AI_USED
+            get_string('noaiused', 'assignsubmission_genaiuse'),
+            ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED
         );
         $mform->addGroup(
             $radioarray,
