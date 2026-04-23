@@ -58,7 +58,21 @@ $settings->add(new admin_setting_confightmleditor(
     'assignsubmission_genaiuse/presubmissioninformation',
     new lang_string('presubmissioninformation', 'assignsubmission_genaiuse'),
     new lang_string('presubmissioninformation_help', 'assignsubmission_genaiuse'),
-    ''
+    '',
+    PARAM_RAW,
+    '',
+    '20'
+));
+
+// AI use acknowledgement content shown on the submission form when AI use is declared.
+$settings->add(new admin_setting_confightmleditor(
+    'assignsubmission_genaiuse/genaiuse_aiuseacknowledgementextra',
+    new lang_string('genaiuse_aiuseacknowledgementextra', 'assignsubmission_genaiuse'),
+    new lang_string('genaiuse_aiuseacknowledgementextra_help', 'assignsubmission_genaiuse'),
+    '',
+    PARAM_RAW,
+    '',
+    '20'
 ));
 
 // Tool use template text (richtext default for the Tool use editor field on the submission form).
@@ -66,7 +80,11 @@ $settings->add(new admin_setting_confightmleditor(
     'assignsubmission_genaiuse/toolusetemplatecontent',
     new lang_string('toolusetemplatecontent', 'assignsubmission_genaiuse'),
     new lang_string('toolusetemplatecontent_help', 'assignsubmission_genaiuse'),
-    ''
+    '',
+    PARAM_RAW,
+    '',
+    '20'
+    
 ));
 
 // Tool use template (optional Word document).
@@ -93,5 +111,5 @@ $settings->add(new admin_setting_confightmleditor(
     'assignsubmission_genaiuse/onedriverecommendation',
     new lang_string('onedriverecommendation', 'assignsubmission_genaiuse'),
     new lang_string('onedriverecommendation_help', 'assignsubmission_genaiuse'),
-    new lang_string('onedriverecommendation_default', 'assignsubmission_genaiuse')
+    ''
 ));

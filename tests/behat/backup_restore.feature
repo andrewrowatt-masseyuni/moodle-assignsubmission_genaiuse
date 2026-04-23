@@ -32,7 +32,7 @@ Feature: Backup and restore of assignments with Generative AI use statement subm
     Given I am on the "Test assignment" Activity page logged in as student1
     And I press "Add submission"
     And I set the field "Online text" to "My original work without AI."
-    And I click on "No AI Used" "radio"
+    And I set the field "Generative AI use declaration" to "No AI Used"
     And I press "Save changes"
     And I log out
     When I log in as "admin"
@@ -51,7 +51,7 @@ Feature: Backup and restore of assignments with Generative AI use statement subm
     Given I am on the "Test assignment" Activity page logged in as student1
     And I press "Add submission"
     And I set the field "Online text" to "My submission with AI help."
-    And I click on "#id_genaiuse_aiused_1" "css_element"
+    And I set the field "Generative AI use declaration" to "AI Used"
     And I set the field "genaiuse_aitoolsused" to "ChatGPT"
     And I set the field "genaiuse_aiusecontext" to "generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "sample paragraphs"
