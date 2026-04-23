@@ -61,6 +61,14 @@ $settings->add(new admin_setting_confightmleditor(
     ''
 ));
 
+// Tool use template text (richtext default for the Tool use editor field on the submission form).
+$settings->add(new admin_setting_confightmleditor(
+    'assignsubmission_genaiuse/toolusetemplatecontent',
+    new lang_string('toolusetemplatecontent', 'assignsubmission_genaiuse'),
+    new lang_string('toolusetemplatecontent_help', 'assignsubmission_genaiuse'),
+    ''
+));
+
 // Tool use template (optional Word document).
 $settings->add(new admin_setting_configstoredfile(
     'assignsubmission_genaiuse/toolusetemplate',

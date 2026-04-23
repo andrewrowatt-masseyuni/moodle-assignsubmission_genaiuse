@@ -88,6 +88,39 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     }
 
     /**
+     * Get the moodle_url for the tool use template file, or null if not set.
+     *
+     * @return \moodle_url|null
+     */
+    private function get_template_moodle_url() {
+        $fs = get_file_storage();
+        $syscontextid = \context_system::instance()->id;
+        $files = $fs->get_area_files(
+            $syscontextid,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE,
+            0,
+            'id',
+            false
+        );
+
+        if (empty($files)) {
+            return null;
+        }
+
+        $file = reset($files);
+        return \moodle_url::make_pluginfile_url(
+            $syscontextid,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE,
+            0,
+            $file->get_filepath(),
+            $file->get_filename(),
+            true
+        );
+    }
+
+    /**
      * Get the HTML for the tool use template download link.
      *
      * @return string HTML with download link, or empty string if no template.
@@ -451,6 +484,75 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $mform->addElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
 
+        // Tool use section heading.
+        $toolusehdrgroup = [];
+        $toolusehdrgroup[] = $mform->createElement(
+            'static',
+            'genaiuse_tooluse_heading',
+            '',
+            \html_writer::tag('label', get_string('tooluse_heading', 'assignsubmission_genaiuse'))
+        );
+        $mform->addGroup($toolusehdrgroup, 'genaiuse_tooluse_heading_group', '', '', false);
+        $mform->hideIf(
+            'genaiuse_tooluse_heading_group',
+            'genaiuse_aiused',
+            'notchecked',
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
+
+        // Tool use description text (with optional Word template link).
+        $templateurl = $this->get_template_moodle_url();
+        if ($templateurl !== null) {
+            $templatelink = \html_writer::link(
+                $templateurl,
+                get_string('tooluse_template_link', 'assignsubmission_genaiuse'),
+                ['target' => '_blank', 'rel' => 'noopener noreferrer']
+            );
+            $toolusedesc = get_string('tooluse_description', 'assignsubmission_genaiuse', $templatelink);
+        } else {
+            $toolusedesc = get_string('tooluse_description_notemplate', 'assignsubmission_genaiuse');
+        }
+        $toolusedescgroup = [];
+        $toolusedescgroup[] = $mform->createElement(
+            'static',
+            'genaiuse_tooluse_desc',
+            '',
+            \html_writer::tag('p', $toolusedesc)
+        );
+        $mform->addGroup($toolusedescgroup, 'genaiuse_tooluse_desc_group', '', '', false);
+        $mform->hideIf(
+            'genaiuse_tooluse_desc_group',
+            'genaiuse_aiused',
+            'notchecked',
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
+
+        // Tool use richtext editor.
+        $mform->addElement(
+            'editor',
+            'genaiuse_tooluse_editor',
+            get_string('tooluse', 'assignsubmission_genaiuse'),
+            ['rows' => 10]
+        );
+        $mform->setType('genaiuse_tooluse_editor', PARAM_RAW);
+        $mform->hideIf(
+            'genaiuse_tooluse_editor',
+            'genaiuse_aiused',
+            'notchecked',
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
+
+        // Set default tool use content from existing record or site-wide template.
+        if ($existingrecord) {
+            $data->genaiuse_tooluse_editor = ['text' => $existingrecord->tooluse ?? '', 'format' => FORMAT_HTML];
+        } else {
+            $templatecontent = get_config('assignsubmission_genaiuse', 'toolusetemplatecontent');
+            $mform->setDefault(
+                'genaiuse_tooluse_editor',
+                ['text' => $templatecontent ?? '', 'format' => FORMAT_HTML]
+            );
+        }
+
         // Optional OneDrive link field — only visible when enabled on the assignment.
         if (!empty($this->get_config('onedrivelinkenabled'))) {
             $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
@@ -546,11 +648,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $record->aiusecontext = $data->genaiuse_aiusecontext ?? '';
             $record->aicontentdesc = $data->genaiuse_aicontentdesc ?? '';
             $record->aimodification = $data->genaiuse_aimodification ?? '';
+            $tooluseraw = $data->genaiuse_tooluse_editor ?? null;
+            $record->tooluse = is_array($tooluseraw) ? ($tooluseraw['text'] ?? '') : ($tooluseraw ?? '');
         } else {
             $record->aitoolsused = null;
             $record->aiusecontext = null;
             $record->aicontentdesc = null;
             $record->aimodification = null;
+            $record->tooluse = null;
         }
 
         $record->numfiles = $this->count_files($submission->id);
@@ -681,6 +786,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                     ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
                     $submission->id
                 );
+            }
+
+            // Tool use richtext field.
+            if (!empty($record->tooluse)) {
+                $result .= \html_writer::tag('h4', get_string('tooluse_heading', 'assignsubmission_genaiuse'));
+                $result .= format_text($record->tooluse, FORMAT_HTML);
             }
         }
 
