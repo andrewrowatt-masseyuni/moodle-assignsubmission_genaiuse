@@ -57,6 +57,7 @@ $string['genaiuse_aiuseacknowledgementextra_help'] = 'Acknowledgement content di
 $string['genaiuse_aiusecontext'] = 'AI use context';
 $string['genaiuse_aiusecontext_help'] = 'Describe how you used the generative AI tool(s) in relation to this assessment. For example: brainstorming ideas, generating draft text, checking grammar, writing code.';
 $string['genaiuse_declaration'] = 'Generative AI use declaration';
+$string['genaiuse_declaration'] = 'Generative AI use declaration';
 $string['maxbytes'] = 'Maximum evidence file size';
 $string['maxbytes_help'] = 'The maximum size of each supporting evidence file.';
 $string['maxbytesassignsettings'] = 'Generative AI use - Maximum evidence file size';

@@ -75,6 +75,14 @@ $settings->add(new admin_setting_confightmleditor(
     '20'
 ));
 
+// AI use acknowledgement content shown on the submission form when AI use is declared.
+$settings->add(new admin_setting_confightmleditor(
+    'assignsubmission_genaiuse/genaiuse_aiuseacknowledgementextra',
+    new lang_string('genaiuse_aiuseacknowledgementextra', 'assignsubmission_genaiuse'),
+    new lang_string('genaiuse_aiuseacknowledgementextra_help', 'assignsubmission_genaiuse'),
+    new lang_string('genaiuse_aiuseacknowledgementextra_default', 'assignsubmission_genaiuse')
+));
+
 // Tool use template text (richtext default for the Tool use editor field on the submission form).
 $settings->add(new admin_setting_confightmleditor(
     'assignsubmission_genaiuse/toolusetemplatecontent',
