@@ -1,15 +1,13 @@
-#fgroup_id_genaiuse_ai_prefix1_group,
-#fgroup_id_genaiuse_ai_prefix2_group,
-#fgroup_id_genaiuse_ai_prefix3_group,
-#fgroup_id_genaiuse_ai_prefix4_group {
-    padding-bottom: 0;
-}
+.mform .submission_genaiuse.fcontainer {
+    > .fitem {
+        color: orchid;
+        padding-top: 0;
+        padding-bottom: 0;
 
-#fgroup_id_genaiuse_ai_prefix1_group + .fitem,
-#fgroup_id_genaiuse_ai_prefix2_group + .fitem,
-#fgroup_id_genaiuse_ai_prefix3_group + .fitem,
-#fgroup_id_genaiuse_ai_prefix4_group + .fitem {
-    padding-top: 0;
+        p {
+            margin: 0;
+        }
+    }
 }
 
 .alert.assignsubmission_genaiuse {
@@ -22,3 +20,4 @@
         margin-bottom: 0;
     }
 }
+

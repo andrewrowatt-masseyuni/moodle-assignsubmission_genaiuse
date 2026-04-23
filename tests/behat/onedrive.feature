@@ -44,6 +44,7 @@ Feature: OneDrive link submission field for Generative AI use statement
     When I am on the "OneDrive assign" Activity page logged in as student1
     Then I should see "Please use OneDrive for your drafts."
     And I press "Add submission"
+    And I set the field "Generative AI use declaration" to "No AI Used"
     And I should see "OneDrive link"
     And I should see "How to create a OneDrive link"
 
@@ -60,7 +61,7 @@ Feature: OneDrive link submission field for Generative AI use statement
     And I am on the "OneDrive assign" Activity page logged in as student1
     When I press "Add submission"
     And I set the field "Online text" to "My draft submission."
-    And I click on "No AI Used" "radio"
+    And I set the field "Generative AI use declaration" to "No AI Used"
     And I set the field "genaiuse_onedrivelink" to "https://example.com/onedrive/share/abc"
     And I press "Save changes"
     Then I should see "No generative AI was used"

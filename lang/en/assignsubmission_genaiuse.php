@@ -25,13 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['ai_ack_1'] = 'When using AI, I have ensured that the work produced is still my own and I understand that submitting unmodified output from a generative AI tool as my own is NOT acceptable. I understand that I am expected to build on the output, ensuring any submissions are my own ideas and knowledge.';
-$string['ai_ack_2'] = 'I acknowledge awareness of any updates to the generative AI tools used, up to the date of this submission. This includes AI plug-ins or assistants included in existing programs, such as Grammarly. I take responsibility for any fabricated references or factual errors stemming from the use of these tools.';
-$string['ai_ack_3'] = 'I have informed myself of the limitations and implications of using generative AI and related technologies, including the reinforcement of biases and propensity for fabrication.';
-$string['ai_ack_4'] = 'I have used these tools ethically, including not uploading confidential, private, personal, copyrighted, or otherwise sensitive information.';
-$string['ai_ack_5'] = 'To assist with maintaining academic integrity, I have appropriately acknowledged any use of generative AI in my work (list below as applicable).';
-$string['ai_ack_6'] = 'I acknowledge that any undeclared use of generative AI will constitute academic dishonesty and will be dealt with according to relevant University policy.';
-$string['ai_ack_7'] = 'I understand that I will be held accountable for any academic misconduct that arises in breach of any relevant University policy, as well as the consequences of such infringements.';
 $string['ai_content_desc_label'] = 'Content provided by AI';
 $string['ai_modification_label'] = 'How output was modified';
 $string['ai_placeholder_content'] = 'describe content used in task';
@@ -59,8 +52,20 @@ $string['genaiuse_aimodification'] = 'AI output modification';
 $string['genaiuse_aimodification_help'] = 'Explain how you modified or built upon the AI-generated output. For example: rewrote key sections, verified facts and corrected errors, integrated output with original analysis.';
 $string['genaiuse_aitoolsused'] = 'AI tools used';
 $string['genaiuse_aitoolsused_help'] = 'List the generative AI tools or systems you used, including links where possible. For example: ChatGPT (https://chat.openai.com), GitHub Copilot.';
+$string['genaiuse_aiuseacknowledgementextra'] = 'AI Use acknowledgement';
+$string['genaiuse_aiuseacknowledgementextra_default'] = '<ol>
+<li>When using AI, I have ensured that the work produced is still my own and I understand that submitting unmodified output from a generative AI tool as my own is NOT acceptable. I understand that I am expected to build on the output, ensuring any submissions are my own ideas and knowledge.</li>
+<li>I acknowledge awareness of any updates to the generative AI tools used, up to the date of this submission. This includes AI plug-ins or assistants included in existing programs, such as Grammarly. I take responsibility for any fabricated references or factual errors stemming from the use of these tools.</li>
+<li>I have informed myself of the limitations and implications of using generative AI and related technologies, including the reinforcement of biases and propensity for fabrication.</li>
+<li>I have used these tools ethically, including not uploading confidential, private, personal, copyrighted, or otherwise sensitive information.</li>
+<li>To assist with maintaining academic integrity, I have appropriately acknowledged any use of generative AI in my work (list below as applicable).</li>
+<li>I acknowledge that any undeclared use of generative AI will constitute academic dishonesty and will be dealt with according to relevant University policy.</li>
+<li>I understand that I will be held accountable for any academic misconduct that arises in breach of any relevant University policy, as well as the consequences of such infringements.</li>
+</ol>';
+$string['genaiuse_aiuseacknowledgementextra_help'] = 'Acknowledgement content displayed to students on the submission form when they declare that generative AI was used. HTML is supported.';
 $string['genaiuse_aiusecontext'] = 'AI use context';
 $string['genaiuse_aiusecontext_help'] = 'Describe how you used the generative AI tool(s) in relation to this assessment. For example: brainstorming ideas, generating draft text, checking grammar, writing code.';
+$string['genaiuse_declaration'] = 'Generative AI use declaration';
 $string['maxbytes'] = 'Maximum evidence file size';
 $string['maxbytes_help'] = 'The maximum size of each supporting evidence file.';
 $string['maxbytesassignsettings'] = 'Generative AI use - Maximum evidence file size';
