@@ -80,7 +80,10 @@ $settings->add(new admin_setting_confightmleditor(
     'assignsubmission_genaiuse/genaiuse_aiuseacknowledgementextra',
     new lang_string('genaiuse_aiuseacknowledgementextra', 'assignsubmission_genaiuse'),
     new lang_string('genaiuse_aiuseacknowledgementextra_help', 'assignsubmission_genaiuse'),
-    new lang_string('genaiuse_aiuseacknowledgementextra_default', 'assignsubmission_genaiuse')
+    '',
+    PARAM_RAW,
+    '',
+    '20'
 ));
 
 // Tool use template text (richtext default for the Tool use editor field on the submission form).

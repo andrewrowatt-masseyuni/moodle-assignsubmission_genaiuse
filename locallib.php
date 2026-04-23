@@ -420,9 +420,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // Acknowledgement content from the site-wide setting (falls back to lang default on fresh install).
         $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
-        if ($ackcontent === false) {
-            $ackcontent = get_string('genaiuse_aiuseacknowledgementextra_default', 'assignsubmission_genaiuse');
-        }
         if ((string)$ackcontent !== '') {
             $ackhtml = \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement']);
             $ackgroup = [];
@@ -775,9 +772,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             );
 
             $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
-            if ($ackcontent === false) {
-                $ackcontent = get_string('genaiuse_aiuseacknowledgementextra_default', 'assignsubmission_genaiuse');
-            }
             if ((string)$ackcontent !== '') {
                 $result .= \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement']);
             }
