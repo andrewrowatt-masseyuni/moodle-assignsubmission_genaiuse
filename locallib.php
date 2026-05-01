@@ -292,6 +292,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // Enable independent styling of the plugin form elements.
         $mform->addElement('html', '<div class="submission_genaiuse fcontainer">');
 
+        $mform->addElement('html', '<div class="submission_genaiuse genaiuse fcontainer">');
+
         $mform->addElement(
             'static',
             'genaiuse_heading1',
@@ -314,15 +316,17 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         );
         $mform->addRule('genaiuse_aiused', get_string('required'), 'required', null, 'client');
 
+        $mform->addElement('html', '</div>'); // Close heading and dropdown div.
+
         // Declaration text visible when aiused == 0.
         $noaidecl = '';
         $noaidecl .= \html_writer::tag(
             'p',
             get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname),
-            ['class' => 'ml-5']
+            ['class' => '']
         );
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'), ['class' => 'ml-5']);
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'), ['class' => 'ml-5']);
+        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'), ['class' => '']);
+        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'), ['class' => '']);
 
         $noaigroup = [];
         $noaigroup[] = $mform->createElement('static', 'genaiuse_noai_text', '', $noaidecl);
@@ -347,93 +351,81 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $requiredrule = get_string('fieldrequired', 'assignsubmission_genaiuse');
 
         // Field 1: AI tools used.
-        $prefix1group = [];
-        $prefix1group[] = $mform->createElement(
+        $aigroup = [];
+        $aigroup[] = $mform->createElement(
             'static',
             'genaiuse_ai_prefix1',
             '',
             \html_writer::tag('span', get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname))
             . $OUTPUT->help_icon('genaiuse_aitoolsused', 'assignsubmission_genaiuse')
         );
-        $mform->addGroup($prefix1group, 'genaiuse_ai_prefix1_group', '', '', false);
-        $mform->hideIf('genaiuse_ai_prefix1_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-
-        $mform->addElement('textarea', 'genaiuse_aitoolsused', '', ['rows' => 2, 'cols' => 60,
+        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aitoolsused', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_tools', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aitoolsused', PARAM_TEXT);
         $mform->hideIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        // Field 2: AI use context.
-        $prefix2group = [];
-        $prefix2group[] = $mform->createElement(
+        $aigroup[] = $mform->createElement(
             'static',
             'genaiuse_ai_prefix2',
             '',
             \html_writer::tag('span', get_string('ai_prefix_context', 'assignsubmission_genaiuse'))
             . $OUTPUT->help_icon('genaiuse_aiusecontext', 'assignsubmission_genaiuse')
         );
-        $mform->addGroup($prefix2group, 'genaiuse_ai_prefix2_group', '', '', false);
-        $mform->hideIf('genaiuse_ai_prefix2_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        $mform->addElement('textarea', 'genaiuse_aiusecontext', '', ['rows' => 2, 'cols' => 60,
+        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aiusecontext', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_context', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aiusecontext', PARAM_TEXT);
         $mform->hideIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        // Field 3: AI content description.
-        $prefix3group = [];
-        $prefix3group[] = $mform->createElement(
+        $aigroup[] = $mform->createElement(
             'static',
             'genaiuse_ai_prefix3',
             '',
             \html_writer::tag('span', get_string('ai_prefix_content', 'assignsubmission_genaiuse'))
             . $OUTPUT->help_icon('genaiuse_aicontentdesc', 'assignsubmission_genaiuse')
         );
-        $mform->addGroup($prefix3group, 'genaiuse_ai_prefix3_group', '', '', false);
-        $mform->hideIf('genaiuse_ai_prefix3_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        $mform->addElement('textarea', 'genaiuse_aicontentdesc', '', ['rows' => 2, 'cols' => 60,
+        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aicontentdesc', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_content', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aicontentdesc', PARAM_TEXT);
         $mform->hideIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        // Field 4: AI modification.
-        $prefix4group = [];
-        $prefix4group[] = $mform->createElement(
+        $aigroup[] = $mform->createElement(
             'static',
             'genaiuse_ai_prefix4',
             '',
             \html_writer::tag('span', get_string('ai_prefix_modification', 'assignsubmission_genaiuse'))
             . $OUTPUT->help_icon('genaiuse_aimodification', 'assignsubmission_genaiuse')
         );
-        $mform->addGroup($prefix4group, 'genaiuse_ai_prefix4_group', '', '', false);
-        $mform->hideIf('genaiuse_ai_prefix4_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        $mform->addElement('textarea', 'genaiuse_aimodification', '', ['rows' => 2, 'cols' => 60,
+        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aimodification', '', ['rows' => 2, 'cols' => 60,
             'placeholder' => get_string('ai_placeholder_modification', 'assignsubmission_genaiuse')]);
         $mform->setType('genaiuse_aimodification', PARAM_TEXT);
         $mform->hideIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
         $mform->disabledIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        // Acknowledgement content from the site-wide setting (falls back to lang default on fresh install).
+                // Acknowledgement content from the site-wide setting (falls back to lang default on fresh install).
         $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
         if ((string)$ackcontent !== '') {
             $ackhtml = \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement']);
             $ackgroup = [];
-            $ackgroup[] = $mform->createElement('static', 'genaiuse_ai_ack_text', '', $ackhtml);
-            $mform->addGroup($ackgroup, 'genaiuse_ai_ack_group', '', '', false);
-            $mform->hideIf('genaiuse_ai_ack_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+            $aigroup[] = $mform->createElement('static', 'genaiuse_ai_ack_text', '', $ackhtml);
         }
+
+        $mform->addGroup($aigroup, 'genaiuse_ai_group', '', '', false, ['class' => 'mt-3']);
+        $mform->hideIf('genaiuse_ai_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+
+        $mform->addElement('html', '<div class="submission_genaiuse genaiuse_evidence fcontainer">');
 
         $evidenceheadergroup = [];
         $evidenceheadergroup[] = $mform->createElement(
             'static',
             'genaiuse_evidence_header_text',
             '',
-            \html_writer::tag('label', get_string('supportingevidence', 'assignsubmission_genaiuse'))
+            \html_writer::tag('label', get_string('supportingevidence', 'assignsubmission_genaiuse'), ['class' => 'mt-3'])
         );
         $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '', false);
         $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'eq', '');
@@ -494,7 +486,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'static',
             'genaiuse_tooluse_heading',
             '',
-            \html_writer::tag('label', get_string('tooluse_heading', 'assignsubmission_genaiuse'))
+            \html_writer::tag('label', get_string('tooluse_heading', 'assignsubmission_genaiuse'), ['class' => 'mt-3'])
         );
         $mform->addGroup($toolusehdrgroup, 'genaiuse_tooluse_heading_group', '', '', false);
         $mform->hideIf(
@@ -557,8 +549,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             );
         }
 
+        $mform->addElement('html', '</div>'); // Close evidence div.
+
         // Optional OneDrive link field — only visible when enabled on the assignment.
         if (!empty($this->get_config('onedrivelinkenabled'))) {
+            $mform->addElement('html', '<div class="submission_genaiuse genaiuse_onedrive fcontainer">');
+
             $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
             $onedriveelements = [];
             $onedriveelements[] = $mform->createElement(
@@ -584,7 +580,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 'genaiuse_onedrivelink_group',
                 get_string('onedrivelink', 'assignsubmission_genaiuse'),
                 ' ',
-                false
+                false, 
+                ['class' => 'onedrive-link-group']
             );
             $mform->setType('genaiuse_onedrivelink', PARAM_URL);
             $mform->addHelpButton(
@@ -593,6 +590,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 'assignsubmission_genaiuse'
             );
             $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_aiused', 'eq', '');
+
+            $mform->addElement('html', '</div>'); // Close OneDrive div.
         }
 
         // Conditional validation: require AI detail fields only when AI is used.
@@ -618,7 +617,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             return empty($errors) ? true : $errors;
         });
 
-        $mform->addElement('html', '</div>');
+        $mform->addElement('html', '</div>'); // Close main plugin div.
 
         return true;
     }
