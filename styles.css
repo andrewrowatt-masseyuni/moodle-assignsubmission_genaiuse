@@ -18,17 +18,16 @@
         }
     }
 
-    #fgroup_id_genaiuse_noai_group,
-    #fgroup_id_genaiuse_ai_group {
+    .genaiuse_declaration {
         border: 1px solid #0003;
         border-radius: 0.5em;
         padding: 0.25em 1em 0.5em 1em;
-        /* stylelint-disable-next-line declaration-bang-space-before */
-        margin-top: 0.5em!important;
-        /* stylelint-disable-next-line declaration-bang-space-before */
-        margin-left: 0.5rem!important; /* To match left padding of other form elements */
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-top: 0.5em !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-left: 0.5rem !important; /* To match left padding of other form elements */
 
-        &.fitem:hover {
+        .fitem:hover {
             background-color: transparent;
         }
 
@@ -36,22 +35,51 @@
             font-size: 90%;
             font-weight: 300;
         }
-
-
     }
 
-    .genaiuse_evidence {
-        border: 4px solid blueviolet;
+    .genaiuse_tooluse {
+        border: 1px solid #0003;
+        border-radius: 0.5em;
+        padding: 0.25em 1em 0.5em 1em;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-top: 0.5em !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-left: 0.5rem !important; /* To match left padding of other form elements */
+
+        &.fitem:hover {
+            background-color: transparent;
+        }
 
         >.fitem:hover {
             background-color: inherit;
         }
     }
 
+    .genaiuse_evidence {
+        border: 1px solid #0003;
+        border-radius: 0.5em;
+        padding: 0.25em 1em 0.5em 1em;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-top: 0.5em !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-left: 0.5rem !important; /* To match left padding of other form elements */
+
+        &.fitem:hover {
+            background-color: transparent;
+        }
+    }
+
     .genaiuse_onedrive {
-        border: 4px solid orange;
-        >.fitem:hover {
-            background-color: inherit;
+        border: 1px solid #0003;
+        border-radius: 0.5em;
+        padding: 0.25em 1em 0.5em 1em;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-top: 0.5em !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        margin-left: 0.5rem !important; /* To match left padding of other form elements */
+
+        &.fitem:hover {
+            background-color: transparent;
         }
     }
 }

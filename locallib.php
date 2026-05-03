@@ -26,6 +26,7 @@ use core_external\external_value;
 
 define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA', 'submission_evidence');
 define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE', 'submission_template');
+define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE', 'submission_tooluse');
 define('ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED', 0);
 define('ASSIGNSUBMISSION_GENAIUSE_AI_USED', 1);
 
@@ -292,14 +293,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // Enable independent styling of the plugin form elements.
         $mform->addElement('html', '<div class="submission_genaiuse fcontainer">');
 
-        $mform->addElement('html', '<div class="submission_genaiuse genaiuse fcontainer">');
-
         $mform->addElement(
             'static',
             'genaiuse_heading1',
             '',
             \html_writer::tag('h3', get_string('pluginname', 'assignsubmission_genaiuse'))
         );
+
+        $mform->addElement('html', '<div class="submission_genaiuse genaiuse_declaration fcontainer">');
 
         // Dropdown: Choose / AI Used / No AI Used. A dropdown (rather than radios) lets hideIf
         // distinguish "no selection" (value '') from the two selected states via 'eq'/'neq'.
@@ -316,7 +317,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         );
         $mform->addRule('genaiuse_aiused', get_string('required'), 'required', null, 'client');
 
-        $mform->addElement('html', '</div>'); // Close heading and dropdown div.
+        
 
         // Declaration text visible when aiused == 0.
         $noaidecl = '';
@@ -415,85 +416,18 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $aigroup[] = $mform->createElement('static', 'genaiuse_ai_ack_text', '', $ackhtml);
         }
 
-        $mform->addGroup($aigroup, 'genaiuse_ai_group', '', '', false, ['class' => 'mt-3']);
+        $mform->addGroup($aigroup, 'genaiuse_ai_group', '', '<div class="w-100"></div>', false, ['class' => 'mt-3']);
         $mform->hideIf('genaiuse_ai_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        $mform->addElement('html', '<div class="submission_genaiuse genaiuse_evidence fcontainer">');
+        $mform->addElement('html', '</div>'); // Close heading and dropdown div.
 
-        $evidenceheadergroup = [];
-        $evidenceheadergroup[] = $mform->createElement(
-            'static',
-            'genaiuse_evidence_header_text',
-            '',
-            \html_writer::tag('label', get_string('supportingevidence', 'assignsubmission_genaiuse'), ['class' => 'mt-3'])
-        );
-        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '', false);
-        $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'eq', '');
 
-        $evidencetext1group = [];
-        $evidencetext1group[] = $mform->createElement(
-            'static',
-            'genaiuse_evidence_text1',
-            '',
-            \html_writer::tag('p', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'))
-        );
-        $mform->addGroup($evidencetext1group, 'genaiuse_evidence_text1_group', '', '', false);
-        $mform->hideIf('genaiuse_evidence_text1_group', 'genaiuse_aiused', 'eq', '');
-
-        $supportingevidencetext2group = [];
-        $supportingevidencetext2group[] = $mform->createElement(
-            'static',
-            'genaiuse_evidence_text2',
-            '',
-            \html_writer::tag('p', get_string('supportingevidence_text2', 'assignsubmission_genaiuse'))
-        );
-        $mform->addGroup($supportingevidencetext2group, 'supportingevidence_text2_group', '', '', false);
-        $mform->hideIf(
-            'supportingevidence_text2_group',
-            'genaiuse_aiused',
-            'neq',
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
-        );
-
-        // Tool use template download link.
-        $templatehtml = $this->get_template_download_html();
-        if (!empty($templatehtml)) {
-            $templategroup = [];
-            $templategroup[] = $mform->createElement('static', 'genaiuse_template_link', '', $templatehtml);
-            $mform->addGroup($templategroup, 'genaiuse_template_group', '', '', false);
-            $mform->hideIf('genaiuse_template_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-        }
-
-        $fileoptions = $this->get_file_options();
-        $submissionid = $submission ? $submission->id : 0;
-
-        $data = file_prepare_standard_filemanager(
-            $data,
-            'genaiuse_evidence',
-            $fileoptions,
-            $this->assignment->get_context(),
-            'assignsubmission_genaiuse',
-            ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
-            $submissionid
-        );
-
-        $mform->addElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
-        $mform->hideIf('genaiuse_evidence_filemanager', 'genaiuse_aiused', 'eq', '');
-
-        // Tool use section heading.
-        $toolusehdrgroup = [];
-        $toolusehdrgroup[] = $mform->createElement(
+        $toolusegroup = [];
+        $toolusegroup[] = $mform->createElement(
             'static',
             'genaiuse_tooluse_heading',
             '',
-            \html_writer::tag('label', get_string('tooluse_heading', 'assignsubmission_genaiuse'), ['class' => 'mt-3'])
-        );
-        $mform->addGroup($toolusehdrgroup, 'genaiuse_tooluse_heading_group', '', '', false);
-        $mform->hideIf(
-            'genaiuse_tooluse_heading_group',
-            'genaiuse_aiused',
-            'neq',
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+            \html_writer::tag('label', get_string('tooluse_heading', 'assignsubmission_genaiuse'), [])
         );
 
         // Tool use description text (with optional Word template link).
@@ -508,35 +442,22 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         } else {
             $toolusedesc = get_string('tooluse_description_notemplate', 'assignsubmission_genaiuse');
         }
-        $toolusedescgroup = [];
-        $toolusedescgroup[] = $mform->createElement(
+
+        $toolusegroup[] = $mform->createElement(
             'static',
             'genaiuse_tooluse_desc',
             '',
             \html_writer::tag('p', $toolusedesc)
         );
-        $mform->addGroup($toolusedescgroup, 'genaiuse_tooluse_desc_group', '', '', false);
-        $mform->hideIf(
-            'genaiuse_tooluse_desc_group',
-            'genaiuse_aiused',
-            'neq',
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
-        );
 
         // Tool use richtext editor.
-        $mform->addElement(
+        $toolusegroup[] = $mform->createElement(
             'editor',
             'genaiuse_tooluse_editor',
-            get_string('tooluse', 'assignsubmission_genaiuse'),
-            ['rows' => 10]
+            /* get_string('tooluse', 'assignsubmission_genaiuse') */'',
+            ['rows' => 15]
         );
         $mform->setType('genaiuse_tooluse_editor', PARAM_RAW);
-        $mform->hideIf(
-            'genaiuse_tooluse_editor',
-            'genaiuse_aiused',
-            'neq',
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
-        );
 
         // Set default tool use content from existing record or site-wide template.
         if ($existingrecord) {
@@ -549,20 +470,133 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             );
         }
 
-        $mform->addElement('html', '</div>'); // Close evidence div.
+        if ($templateurl !== null) {
+            $tooluseuploadtext = get_string(
+                'tooluse_upload_text',
+                'assignsubmission_genaiuse',
+                \html_writer::link(
+                    $templateurl,
+                    get_string('tooluse_template_link', 'assignsubmission_genaiuse'),
+                    ['target' => '_blank', 'rel' => 'noopener noreferrer']
+                )
+            );
+            
+            $toolusegroup[] = $mform->createElement(
+                'static',
+                'genaiuse_tooluse_upload_text',
+                '',
+                \html_writer::tag('p', $tooluseuploadtext)
+            );
+        }
+
+        // Tool use file manager.
+        $submissionid = $submission ? $submission->id : 0;
+        $toolusefileoptions = $this->get_file_options();
+        $data = file_prepare_standard_filemanager(
+            $data,
+            'genaiuse_tooluse',
+            $toolusefileoptions,
+            $this->assignment->get_context(),
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+            $submissionid
+        );
+
+        $toolusegroup[] = $mform->createElement('filemanager', 'genaiuse_tooluse_filemanager', '', null, $toolusefileoptions);
+
+        $mform->addGroup($toolusegroup, 'genaiuse_tooluse_heading_group', '', '<div class="w-100"></div>', false, ['class' => 'genaiuse_tooluse']);
+        $mform->hideIf(
+            'genaiuse_tooluse_heading_group',
+            'genaiuse_aiused',
+            'neq',
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
+
+        // $mform->addElement('html', '</div>'); // Close tooluse div.
+
+        // $mform->addElement('html', '<div class="submission_genaiuse genaiuse_evidence fcontainer">');
+
+        // Supporting evidence file manager and instructions, visible when aiused == 1.
+
+        $evidenceheadergroup = [];
+        $evidenceheadergroup[] = $mform->createElement(
+            'static',
+            'genaiuse_evidence_header_text',
+            '',
+            \html_writer::tag('label', get_string('supportingevidence', 'assignsubmission_genaiuse'), [])
+        );
+
+        $evidenceheadergroup[] = $mform->createElement(
+            'static',
+            'genaiuse_evidence_text1',
+            '',
+            \html_writer::tag('p', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'))
+        );
+
+        /*
+
+        $evidenceheadergroup[] = $mform->createElement(
+            'static',
+            'genaiuse_evidence_text2',
+            '',
+            \html_writer::tag('p', get_string('supportingevidence_text2', 'assignsubmission_genaiuse'))
+        );
+
+        */
+
+        $fileoptions = $this->get_file_options();
+
+        $data = file_prepare_standard_filemanager(
+            $data,
+            'genaiuse_evidence',
+            $fileoptions,
+            $this->assignment->get_context(),
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+            $submissionid
+        );
+
+        $evidenceheadergroup[] = $mform->createElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
+
+
+        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '<div class="w-100"></div>', false, ['class' => 'genaiuse_evidence']);
+        $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'eq', '');
+
+
+        // $mform->addElement('html', '</div>'); // Close supporting evidence instructions div.
 
         // Optional OneDrive link field — only visible when enabled on the assignment.
         if (!empty($this->get_config('onedrivelinkenabled'))) {
-            $mform->addElement('html', '<div class="submission_genaiuse genaiuse_onedrive fcontainer">');
+            // $mform->addElement('html', '<div class="submission_genaiuse genaiuse_onedrive fcontainer">');
+
+
 
             $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
             $onedriveelements = [];
+
+            $onedriveelements[] = $mform->createElement(
+                'static',
+                'onedrivelink_header_text',
+                '',
+                \html_writer::tag('label', get_string('onedrive', 'assignsubmission_genaiuse'), [])
+            );
+
+            $onedriveelements[] = $mform->createElement(
+                'static',
+                'onedrivelink_instructions',
+                '',
+                \html_writer::tag('p', get_string('onedrivelink', 'assignsubmission_genaiuse'))
+            );
+
             $onedriveelements[] = $mform->createElement(
                 'text',
                 'genaiuse_onedrivelink',
                 '',
                 ['size' => 60]
             );
+
+            $mform->setType('genaiuse_onedrivelink', PARAM_URL);
+
             if (!empty($assistanceurl)) {
                 $onedriveelements[] = $mform->createElement(
                     'static',
@@ -575,23 +609,26 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                     )
                 );
             }
+
             $mform->addGroup(
                 $onedriveelements,
                 'genaiuse_onedrivelink_group',
-                get_string('onedrivelink', 'assignsubmission_genaiuse'),
-                ' ',
-                false, 
-                ['class' => 'onedrive-link-group']
+                /* get_string('onedrivelink', 'assignsubmission_genaiuse')*/'',
+                '<div class="w-100"></div>',
+                false,
+                ['class' => 'genaiuse_onedrive']
             );
-            $mform->setType('genaiuse_onedrivelink', PARAM_URL);
+            
+            /*
             $mform->addHelpButton(
                 'genaiuse_onedrivelink_group',
                 'onedrivelink',
                 'assignsubmission_genaiuse'
             );
+            */
             $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_aiused', 'eq', '');
 
-            $mform->addElement('html', '</div>'); // Close OneDrive div.
+            //$mform->addElement('html', '</div>'); // Close OneDrive div.
         }
 
         // Conditional validation: require AI detail fields only when AI is used.
@@ -641,6 +678,17 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $this->assignment->get_context(),
             'assignsubmission_genaiuse',
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+            $submission->id
+        );
+
+        // Save tool use files.
+        $data = file_postupdate_standard_filemanager(
+            $data,
+            'genaiuse_tooluse',
+            $fileoptions,
+            $this->assignment->get_context(),
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
             $submission->id
         );
 
@@ -824,6 +872,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
             $submission->id
         );
+        $fs->delete_area_files(
+            $this->assignment->get_context()->id,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+            $submission->id
+        );
 
         $DB->delete_records('assignsubmission_genaiuse', ['submission' => $submission->id]);
         return true;
@@ -843,6 +897,11 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'assignsubmission_genaiuse',
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA
         );
+        $fs->delete_area_files(
+            $this->assignment->get_context()->id,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE
+        );
 
         $DB->delete_records(
             'assignsubmission_genaiuse',
@@ -857,7 +916,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      * @return array
      */
     public function get_file_areas() {
-        return [ASSIGNSUBMISSION_GENAIUSE_FILEAREA => $this->get_name()];
+        return [
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA => $this->get_name(),
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE => $this->get_name(),
+        ];
     }
 
     /**
@@ -882,6 +944,18 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             false
         );
         foreach ($files as $file) {
+            $fs->create_file_from_storedfile(['itemid' => $destsubmission->id], $file);
+        }
+
+        $toolusefiles = $fs->get_area_files(
+            $contextid,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+            $sourcesubmission->id,
+            'id',
+            false
+        );
+        foreach ($toolusefiles as $file) {
             $fs->create_file_from_storedfile(['itemid' => $destsubmission->id], $file);
         }
 
