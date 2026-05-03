@@ -25,6 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['ack_confirm'] = 'I have read the acknowledgement above and agree to it.';
+$string['ack_required'] = 'You must confirm that you have read the AI use acknowledgement.';
+$string['ack_summary'] = 'Read the AI use acknowledgement';
 $string['ai_content_desc_label'] = 'Content provided by AI';
 $string['ai_modification_label'] = 'How output was modified';
 $string['ai_placeholder_content'] = 'describe content used in task';
@@ -39,6 +42,8 @@ $string['ai_tools_used_label'] = 'AI system(s) and link(s)';
 $string['ai_use_context_label'] = 'Specific use';
 $string['aiused'] = 'AI Used';
 $string['aiusedstatement'] = 'Generative AI was used';
+$string['cardstatus_optional'] = 'Optional';
+$string['cardstatus_required'] = 'Required';
 $string['default'] = 'Enabled by default';
 $string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
 $string['downloadtemplate'] = 'Download tool use template:';

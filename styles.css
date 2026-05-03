@@ -12,76 +12,142 @@
         line-height: 1.4;
     }
 
-    .genaiuse {
-        >.fitem:hover {
-            background-color: inherit;
-        }
+    ::placeholder {
+        font-size: 90%;
+        font-weight: 300;
     }
+}
 
-    .genaiuse_declaration {
-        border: 1px solid #0003;
-        border-radius: 0.5em;
-        padding: 0.25em 1em 0.5em 1em;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-top: 0.5em !important;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-left: 0.5rem !important; /* To match left padding of other form elements */
+.mform .submission_genaiuse_pageheading {
+    margin-bottom: 0.75rem;
+}
 
-        .fitem:hover {
-            background-color: transparent;
-        }
+.mform .submission_genaiuse_card {
+    margin-left: 0.5rem;
+}
 
-        ::placeholder {
-            font-size: 90%;
-            font-weight: 300;
-        }
+.mform .submission_genaiuse_card > .submission_genaiuse_cardheader {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 0.5rem 1rem;
+}
+
+.mform .submission_genaiuse_cardtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.mform .submission_genaiuse_card_required {
+    border-left: 3px solid #dc3545;
+}
+
+.mform .submission_genaiuse_card_optional {
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+.mform .submission_genaiuse_badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.2em 0.6em;
+    border-radius: 0.375rem;
+    color: #fff;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.mform .submission_genaiuse_badge_required {
+    background-color: #dc3545;
+}
+
+.mform .submission_genaiuse_badge_optional {
+    background-color: #6c757d;
+}
+
+/* Hide a collapsible card whose only inner form group is hidden by hideIf. */
+.mform .submission_genaiuse_card_collapsible:has(> .card-body > .fitem[hidden]:only-child) {
+    display: none;
+}
+
+/* Stack the AI-detail field labels above their textareas, full-width within the card body.
+   Targets are by fitem ID — Moodle propagates a `class` attr on form elements onto the wrapper
+   row, which would add an unwanted border, so a class-based selector is not safe here. */
+.mform #fitem_id_genaiuse_aitoolsused,
+.mform #fitem_id_genaiuse_aiusecontext,
+.mform #fitem_id_genaiuse_aicontentdesc,
+.mform #fitem_id_genaiuse_aimodification,
+.mform #fitem_id_genaiuse_ai_ack_text {
+    display: block;
+}
+
+.mform #fitem_id_genaiuse_aitoolsused > .col-md-3,
+.mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
+.mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
+.mform #fitem_id_genaiuse_aimodification > .col-md-3,
+.mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
+.mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
+.mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
+.mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
+.mform #fitem_id_genaiuse_aimodification > .col-md-9,
+.mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* On md+ indent both stacked rows by 25% so they line up with col-md-9 content
+   in sibling cards (e.g. the Tool use card). */
+@media (min-width: 768px) {
+    .mform #fitem_id_genaiuse_aitoolsused > .col-md-3,
+    .mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
+    .mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
+    .mform #fitem_id_genaiuse_aimodification > .col-md-3,
+    .mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
+    .mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
+    .mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
+    .mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
+    .mform #fitem_id_genaiuse_aimodification > .col-md-9,
+    .mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+        margin-left: 25%;
     }
+}
 
-    .genaiuse_tooluse {
-        border: 1px solid #0003;
-        border-radius: 0.5em;
-        padding: 0.25em 1em 0.5em 1em;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-top: 0.5em !important;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-left: 0.5rem !important; /* To match left padding of other form elements */
+.mform .submission_genaiuse_aifield_label {
+    font-weight: 500;
+}
 
-        &.fitem:hover {
-            background-color: transparent;
-        }
+.mform .genaiuse_acknowledgement_details {
+    width: 100%;
+    margin: 0.5rem 0;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.375rem;
+}
 
-        >.fitem:hover {
-            background-color: inherit;
-        }
-    }
+.mform .genaiuse_acknowledgement_details > summary {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.025);
+    border-radius: 0.375rem;
+}
 
-    .genaiuse_evidence {
-        border: 1px solid #0003;
-        border-radius: 0.5em;
-        padding: 0.25em 1em 0.5em 1em;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-top: 0.5em !important;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-left: 0.5rem !important; /* To match left padding of other form elements */
+.mform .genaiuse_acknowledgement_details[open] > summary {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
 
-        &.fitem:hover {
-            background-color: transparent;
-        }
-    }
+.mform .genaiuse_acknowledgement_details > .genaiuse_acknowledgement {
+    padding: 0.5rem 0.75rem;
+}
 
-    .genaiuse_onedrive {
-        border: 1px solid #0003;
-        border-radius: 0.5em;
-        padding: 0.25em 1em 0.5em 1em;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-top: 0.5em !important;
-        /* stylelint-disable-next-line declaration-no-important */
-        margin-left: 0.5rem !important; /* To match left padding of other form elements */
-
-        &.fitem:hover {
-            background-color: transparent;
-        }
-    }
+.mform .genaiuse_acknowledgement_details > .genaiuse_acknowledgement > p:last-child {
+    margin-bottom: 0;
 }
 
 .alert.assignsubmission_genaiuse {
@@ -94,4 +160,3 @@
         margin-bottom: 0;
     }
 }
-

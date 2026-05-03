@@ -279,8 +279,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      * @return bool
      */
     public function get_form_elements_for_user($submission, MoodleQuickForm $mform, stdClass $data, $userid) {
-        global $OUTPUT;
-
         $user = core_user::get_user($userid);
         $fullname = fullname($user);
 
@@ -290,17 +288,45 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $existingrecord = $this->get_genaiuse_submission($submission->id);
         }
 
-        // Enable independent styling of the plugin form elements.
+        // Required/optional badge HTML, used in card headers.
+        $requiredbadge = \html_writer::tag(
+            'span',
+            get_string('cardstatus_required', 'assignsubmission_genaiuse'),
+            ['class' => 'submission_genaiuse_badge submission_genaiuse_badge_required']
+        );
+        $optionalbadge = \html_writer::tag(
+            'span',
+            get_string('cardstatus_optional', 'assignsubmission_genaiuse'),
+            ['class' => 'submission_genaiuse_badge submission_genaiuse_badge_optional']
+        );
+
+        $cardheader = fn($title, $badge) =>
+            '<div class="card-header submission_genaiuse_cardheader d-flex justify-content-between align-items-center">'
+            . \html_writer::tag('h4', $title, ['class' => 'submission_genaiuse_cardtitle h6 mb-0'])
+            . $badge
+            . '</div>';
+
+        // Plugin-wide wrapper for scoped styling.
         $mform->addElement('html', '<div class="submission_genaiuse fcontainer">');
 
         $mform->addElement(
             'static',
             'genaiuse_heading1',
             '',
-            \html_writer::tag('h3', get_string('pluginname', 'assignsubmission_genaiuse'))
+            \html_writer::tag(
+                'h3',
+                get_string('pluginname', 'assignsubmission_genaiuse'),
+                ['class' => 'submission_genaiuse_pageheading']
+            )
         );
 
-        $mform->addElement('html', '<div class="submission_genaiuse genaiuse_declaration fcontainer">');
+        // Card 1: Generative AI use declaration (always visible, required).
+        $mform->addElement(
+            'html',
+            '<div class="card submission_genaiuse_card submission_genaiuse_card_required mb-3">'
+            . $cardheader(get_string('genaiuse_declaration', 'assignsubmission_genaiuse'), $requiredbadge)
+            . '<div class="card-body">'
+        );
 
         // Dropdown: Choose / AI Used / No AI Used. A dropdown (rather than radios) lets hideIf
         // distinguish "no selection" (value '') from the two selected states via 'eq'/'neq'.
@@ -317,17 +343,11 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         );
         $mform->addRule('genaiuse_aiused', get_string('required'), 'required', null, 'client');
 
-        
-
         // Declaration text visible when aiused == 0.
         $noaidecl = '';
-        $noaidecl .= \html_writer::tag(
-            'p',
-            get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname),
-            ['class' => '']
-        );
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'), ['class' => '']);
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'), ['class' => '']);
+        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname));
+        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'));
+        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'));
 
         $noaigroup = [];
         $noaigroup[] = $mform->createElement('static', 'genaiuse_noai_text', '', $noaidecl);
@@ -342,93 +362,83 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $data->genaiuse_aicontentdesc = $existingrecord->aicontentdesc ?? '';
             $data->genaiuse_aimodification = $existingrecord->aimodification ?? '';
             $data->genaiuse_onedrivelink = $existingrecord->onedrivelink ?? '';
+            // Pre-tick the acknowledgement on edit if AI use was previously confirmed.
+            if ((int)$existingrecord->aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
+                $data->genaiuse_ack_confirmed = 1;
+            }
         } else {
             // Empty default selects the "Choose..." option so nothing is pre-selected.
             $mform->setDefault('genaiuse_aiused', '');
         }
 
-        // Form fields visible when aiused == 1.
-
         $requiredrule = get_string('fieldrequired', 'assignsubmission_genaiuse');
+        $aiusedstr = (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED;
 
-        // Field 1: AI tools used.
-        $aigroup = [];
-        $aigroup[] = $mform->createElement(
-            'static',
-            'genaiuse_ai_prefix1',
-            '',
-            \html_writer::tag('span', get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname))
-            . $OUTPUT->help_icon('genaiuse_aitoolsused', 'assignsubmission_genaiuse')
-        );
-        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aitoolsused', '', ['rows' => 2, 'cols' => 60,
-            'placeholder' => get_string('ai_placeholder_tools', 'assignsubmission_genaiuse')]);
-        $mform->setType('genaiuse_aitoolsused', PARAM_TEXT);
-        $mform->hideIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-        $mform->disabledIf('genaiuse_aitoolsused', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-
-        $aigroup[] = $mform->createElement(
-            'static',
-            'genaiuse_ai_prefix2',
-            '',
-            \html_writer::tag('span', get_string('ai_prefix_context', 'assignsubmission_genaiuse'))
-            . $OUTPUT->help_icon('genaiuse_aiusecontext', 'assignsubmission_genaiuse')
-        );
-
-        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aiusecontext', '', ['rows' => 2, 'cols' => 60,
-            'placeholder' => get_string('ai_placeholder_context', 'assignsubmission_genaiuse')]);
-        $mform->setType('genaiuse_aiusecontext', PARAM_TEXT);
-        $mform->hideIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-        $mform->disabledIf('genaiuse_aiusecontext', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-
-        $aigroup[] = $mform->createElement(
-            'static',
-            'genaiuse_ai_prefix3',
-            '',
-            \html_writer::tag('span', get_string('ai_prefix_content', 'assignsubmission_genaiuse'))
-            . $OUTPUT->help_icon('genaiuse_aicontentdesc', 'assignsubmission_genaiuse')
-        );
-
-        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aicontentdesc', '', ['rows' => 2, 'cols' => 60,
-            'placeholder' => get_string('ai_placeholder_content', 'assignsubmission_genaiuse')]);
-        $mform->setType('genaiuse_aicontentdesc', PARAM_TEXT);
-        $mform->hideIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-        $mform->disabledIf('genaiuse_aicontentdesc', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-
-        $aigroup[] = $mform->createElement(
-            'static',
-            'genaiuse_ai_prefix4',
-            '',
-            \html_writer::tag('span', get_string('ai_prefix_modification', 'assignsubmission_genaiuse'))
-            . $OUTPUT->help_icon('genaiuse_aimodification', 'assignsubmission_genaiuse')
-        );
-
-        $aigroup[] = $mform->createElement('textarea', 'genaiuse_aimodification', '', ['rows' => 2, 'cols' => 60,
-            'placeholder' => get_string('ai_placeholder_modification', 'assignsubmission_genaiuse')]);
-        $mform->setType('genaiuse_aimodification', PARAM_TEXT);
-        $mform->hideIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-        $mform->disabledIf('genaiuse_aimodification', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-
-                // Acknowledgement content from the site-wide setting (falls back to lang default on fresh install).
-        $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
-        if ((string)$ackcontent !== '') {
-            $ackhtml = \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement']);
-            $ackgroup = [];
-            $aigroup[] = $mform->createElement('static', 'genaiuse_ai_ack_text', '', $ackhtml);
+        // AI-used details: each textarea is its own top-level element so the standard mform renderer
+        // emits an inline error slot (#id_error_<name>) and applies the is-invalid border. The prose
+        // prefix becomes the field label; CSS in styles.css stacks the label above the textarea and
+        // makes the row span the full card body.
+        $aifields = [
+            ['genaiuse_aitoolsused', 'ai_prefix_tools', 'ai_placeholder_tools', $fullname],
+            ['genaiuse_aiusecontext', 'ai_prefix_context', 'ai_placeholder_context', null],
+            ['genaiuse_aicontentdesc', 'ai_prefix_content', 'ai_placeholder_content', null],
+            ['genaiuse_aimodification', 'ai_prefix_modification', 'ai_placeholder_modification', null],
+        ];
+        foreach ($aifields as [$name, $labelkey, $placeholderkey, $labelarg]) {
+            $label = \html_writer::tag(
+                'span',
+                get_string($labelkey, 'assignsubmission_genaiuse', $labelarg),
+                ['class' => 'submission_genaiuse_aifield_label']
+            );
+            $mform->addElement('textarea', $name, $label, [
+                'rows' => 2,
+                'cols' => 60,
+                'placeholder' => get_string($placeholderkey, 'assignsubmission_genaiuse'),
+            ]);
+            $mform->setType($name, PARAM_TEXT);
+            $mform->addHelpButton($name, $name, 'assignsubmission_genaiuse');
+            $mform->hideIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
+            $mform->disabledIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
         }
 
-        $mform->addGroup($aigroup, 'genaiuse_ai_group', '', '<div class="w-100"></div>', false, ['class' => 'mt-3']);
-        $mform->hideIf('genaiuse_ai_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        // Acknowledgement: collapsed <details> block as a top-level static element.
+        $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
+        $hasack = (string)$ackcontent !== '';
+        if ($hasack) {
+            $detailshtml = '<details class="genaiuse_acknowledgement_details"><summary>'
+                . s(get_string('ack_summary', 'assignsubmission_genaiuse'))
+                . '</summary>'
+                . \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement'])
+                . '</details>';
+            $mform->addElement('static', 'genaiuse_ai_ack_text', '', $detailshtml);
+            $mform->hideIf('genaiuse_ai_ack_text', 'genaiuse_aiused', 'neq', $aiusedstr);
+        }
 
-        $mform->addElement('html', '</div>'); // Close heading and dropdown div.
+        // Required acknowledgement checkbox — top-level so its inline error displays correctly.
+        if ($hasack) {
+            $mform->addElement(
+                'advcheckbox',
+                'genaiuse_ack_confirmed',
+                '',
+                get_string('ack_confirm', 'assignsubmission_genaiuse')
+            );
+            $mform->setType('genaiuse_ack_confirmed', PARAM_INT);
+            $mform->hideIf('genaiuse_ack_confirmed', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        }
 
+        // Close declaration card (card-body + card).
+        $mform->addElement('html', '</div></div>');
+
+        // Card 2: Tool use (required when AI used).
+        $mform->addElement(
+            'html',
+            '<div class="card submission_genaiuse_card submission_genaiuse_card_required'
+            . ' submission_genaiuse_card_collapsible mb-3">'
+            . $cardheader(get_string('tooluse_heading', 'assignsubmission_genaiuse'), $requiredbadge)
+            . '<div class="card-body">'
+        );
 
         $toolusegroup = [];
-        $toolusegroup[] = $mform->createElement(
-            'static',
-            'genaiuse_tooluse_heading',
-            '',
-            \html_writer::tag('label', get_string('tooluse_heading', 'assignsubmission_genaiuse'), [])
-        );
 
         // Tool use description text (with optional Word template link).
         $templateurl = $this->get_template_moodle_url();
@@ -451,12 +461,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         );
 
         // Tool use richtext editor.
-        $toolusegroup[] = $mform->createElement(
-            'editor',
-            'genaiuse_tooluse_editor',
-            /* get_string('tooluse', 'assignsubmission_genaiuse') */'',
-            ['rows' => 15]
-        );
+        $toolusegroup[] = $mform->createElement('editor', 'genaiuse_tooluse_editor', '', ['rows' => 15]);
         $mform->setType('genaiuse_tooluse_editor', PARAM_RAW);
 
         // Set default tool use content from existing record or site-wide template.
@@ -480,7 +485,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                     ['target' => '_blank', 'rel' => 'noopener noreferrer']
                 )
             );
-            
             $toolusegroup[] = $mform->createElement(
                 'static',
                 'genaiuse_tooluse_upload_text',
@@ -504,7 +508,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $toolusegroup[] = $mform->createElement('filemanager', 'genaiuse_tooluse_filemanager', '', null, $toolusefileoptions);
 
-        $mform->addGroup($toolusegroup, 'genaiuse_tooluse_heading_group', '', '<div class="w-100"></div>', false, ['class' => 'genaiuse_tooluse']);
+        $mform->addGroup($toolusegroup, 'genaiuse_tooluse_heading_group', '', '<div class="w-100"></div>', false);
         $mform->hideIf(
             'genaiuse_tooluse_heading_group',
             'genaiuse_aiused',
@@ -512,20 +516,18 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
         );
 
-        // $mform->addElement('html', '</div>'); // Close tooluse div.
+        $mform->addElement('html', '</div></div>');
 
-        // $mform->addElement('html', '<div class="submission_genaiuse genaiuse_evidence fcontainer">');
-
-        // Supporting evidence file manager and instructions, visible when aiused == 1.
-
-        $evidenceheadergroup = [];
-        $evidenceheadergroup[] = $mform->createElement(
-            'static',
-            'genaiuse_evidence_header_text',
-            '',
-            \html_writer::tag('label', get_string('supportingevidence', 'assignsubmission_genaiuse'), [])
+        // Card 3: Supporting evidence (optional).
+        $mform->addElement(
+            'html',
+            '<div class="card submission_genaiuse_card submission_genaiuse_card_optional'
+            . ' submission_genaiuse_card_collapsible mb-3">'
+            . $cardheader(get_string('supportingevidence', 'assignsubmission_genaiuse'), $optionalbadge)
+            . '<div class="card-body">'
         );
 
+        $evidenceheadergroup = [];
         $evidenceheadergroup[] = $mform->createElement(
             'static',
             'genaiuse_evidence_text1',
@@ -533,19 +535,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             \html_writer::tag('p', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'))
         );
 
-        /*
-
-        $evidenceheadergroup[] = $mform->createElement(
-            'static',
-            'genaiuse_evidence_text2',
-            '',
-            \html_writer::tag('p', get_string('supportingevidence_text2', 'assignsubmission_genaiuse'))
-        );
-
-        */
-
         $fileoptions = $this->get_file_options();
-
         $data = file_prepare_standard_filemanager(
             $data,
             'genaiuse_evidence',
@@ -558,28 +548,23 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $evidenceheadergroup[] = $mform->createElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
 
-
-        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '<div class="w-100"></div>', false, ['class' => 'genaiuse_evidence']);
+        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '<div class="w-100"></div>', false);
         $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'eq', '');
 
+        $mform->addElement('html', '</div></div>');
 
-        // $mform->addElement('html', '</div>'); // Close supporting evidence instructions div.
-
-        // Optional OneDrive link field — only visible when enabled on the assignment.
+        // Card 4: OneDrive link (optional, only when enabled on the assignment).
         if (!empty($this->get_config('onedrivelinkenabled'))) {
-            // $mform->addElement('html', '<div class="submission_genaiuse genaiuse_onedrive fcontainer">');
-
-
+            $mform->addElement(
+                'html',
+                '<div class="card submission_genaiuse_card submission_genaiuse_card_optional'
+                . ' submission_genaiuse_card_collapsible mb-3">'
+                . $cardheader(get_string('onedrive', 'assignsubmission_genaiuse'), $optionalbadge)
+                . '<div class="card-body">'
+            );
 
             $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
             $onedriveelements = [];
-
-            $onedriveelements[] = $mform->createElement(
-                'static',
-                'onedrivelink_header_text',
-                '',
-                \html_writer::tag('label', get_string('onedrive', 'assignsubmission_genaiuse'), [])
-            );
 
             $onedriveelements[] = $mform->createElement(
                 'static',
@@ -594,7 +579,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 '',
                 ['size' => 60]
             );
-
             $mform->setType('genaiuse_onedrivelink', PARAM_URL);
 
             if (!empty($assistanceurl)) {
@@ -613,42 +597,36 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->addGroup(
                 $onedriveelements,
                 'genaiuse_onedrivelink_group',
-                /* get_string('onedrivelink', 'assignsubmission_genaiuse')*/'',
+                '',
                 '<div class="w-100"></div>',
-                false,
-                ['class' => 'genaiuse_onedrive']
+                false
             );
-            
-            /*
-            $mform->addHelpButton(
-                'genaiuse_onedrivelink_group',
-                'onedrivelink',
-                'assignsubmission_genaiuse'
-            );
-            */
             $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_aiused', 'eq', '');
 
-            //$mform->addElement('html', '</div>'); // Close OneDrive div.
+            $mform->addElement('html', '</div></div>');
         }
 
-        // Conditional validation: require AI detail fields only when AI is used.
-        $mform->addFormRule(function ($values) use ($requiredrule) {
+        // Conditional validation: require AI detail fields and acknowledgement only when AI is used.
+        $mform->addFormRule(function ($values) use ($requiredrule, $hasack) {
             $errors = [];
             if (
                 isset($values['genaiuse_aiused'])
                     && (int)$values['genaiuse_aiused'] === ASSIGNSUBMISSION_GENAIUSE_AI_USED
             ) {
-                if (empty(trim($values['genaiuse_aitoolsused'] ?? ''))) {
-                    $errors['genaiuse_aitoolsused'] = $requiredrule;
+                foreach (
+                    [
+                    'genaiuse_aitoolsused',
+                    'genaiuse_aiusecontext',
+                    'genaiuse_aicontentdesc',
+                    'genaiuse_aimodification',
+                    ] as $field
+                ) {
+                    if (empty(trim($values[$field] ?? ''))) {
+                        $errors[$field] = $requiredrule;
+                    }
                 }
-                if (empty(trim($values['genaiuse_aiusecontext'] ?? ''))) {
-                    $errors['genaiuse_aiusecontext'] = $requiredrule;
-                }
-                if (empty(trim($values['genaiuse_aicontentdesc'] ?? ''))) {
-                    $errors['genaiuse_aicontentdesc'] = $requiredrule;
-                }
-                if (empty(trim($values['genaiuse_aimodification'] ?? ''))) {
-                    $errors['genaiuse_aimodification'] = $requiredrule;
+                if ($hasack && empty($values['genaiuse_ack_confirmed'])) {
+                    $errors['genaiuse_ack_confirmed'] = get_string('ack_required', 'assignsubmission_genaiuse');
                 }
             }
             return empty($errors) ? true : $errors;
