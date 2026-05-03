@@ -328,20 +328,48 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             . '<div class="card-body">'
         );
 
-        // Dropdown: Choose / AI Used / No AI Used. A dropdown (rather than radios) lets hideIf
-        // distinguish "no selection" (value '') from the two selected states via 'eq'/'neq'.
-        $aiusedoptions = [
-            '' => get_string('choosedots'),
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED => get_string('aiused', 'assignsubmission_genaiuse'),
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED => get_string('noaiused', 'assignsubmission_genaiuse'),
-        ];
-        $mform->addElement(
-            'select',
-            'genaiuse_aiused',
-            get_string('genaiuse_declaration', 'assignsubmission_genaiuse'),
-            $aiusedoptions
+        // Two radio cards: "AI Used" / "No AI Used". A third hidden sentinel radio with value=''
+        // is the default so the field always carries a value — without it, Moodle's hideIf JS
+        // (lib/form/form.js _dependencyDefault) skips unchecked radios and `lock` stays false,
+        // which would leave both downstream subforms visible. The empty-string value also fails
+        // the required rule's `'' != trim($value)` check, so the user is still forced to pick.
+        $radiocard = fn($title, $helper) => \html_writer::div(
+            \html_writer::div($title, 'submission_genaiuse_radio_title')
+            . \html_writer::div($helper, 'submission_genaiuse_radio_helper'),
+            'submission_genaiuse_radio_card'
         );
-        $mform->addRule('genaiuse_aiused', get_string('required'), 'required', null, 'client');
+
+        $radioarray = [];
+        $radioarray[] = $mform->createElement('radio', 'genaiuse_aiused', '', '', '');
+        $radioarray[] = $mform->createElement(
+            'radio',
+            'genaiuse_aiused',
+            '',
+            $radiocard(
+                get_string('aiused', 'assignsubmission_genaiuse'),
+                get_string('aiused_helper', 'assignsubmission_genaiuse')
+            ),
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
+        $radioarray[] = $mform->createElement(
+            'radio',
+            'genaiuse_aiused',
+            '',
+            $radiocard(
+                get_string('noaiused', 'assignsubmission_genaiuse'),
+                get_string('noaiused_helper', 'assignsubmission_genaiuse')
+            ),
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED
+        );
+
+        $mform->addGroup(
+            $radioarray,
+            'genaiuse_aiused_group',
+            get_string('genaiuse_declaration', 'assignsubmission_genaiuse'),
+            '',
+            false
+        );
+        $mform->addRule('genaiuse_aiused_group', get_string('required'), 'required', null, 'client');
 
         // Declaration text visible when aiused == 0.
         $noaidecl = '';
@@ -367,7 +395,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 $data->genaiuse_ack_confirmed = 1;
             }
         } else {
-            // Empty default selects the "Choose..." option so nothing is pre-selected.
+            // Check the hidden sentinel radio so the field has a value (empty string) for
+            // hideIf evaluation. Neither user-facing radio is pre-selected.
             $mform->setDefault('genaiuse_aiused', '');
         }
 

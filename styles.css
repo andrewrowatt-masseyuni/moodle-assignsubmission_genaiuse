@@ -71,6 +71,78 @@
     display: none;
 }
 
+/* Two card-style radios for "AI Used" / "No AI Used". Moodle's grouped-radio template renders
+   each option as <label class="form-check-inline"> wrapping the <input>, so the selected state
+   is matched via :has(input:checked) on the label itself. A third sentinel radio with value=""
+   is included to keep hideIf working when nothing is picked yet — see locallib.php — and is
+   hidden from view here. */
+.mform #fgroup_id_genaiuse_aiused_group fieldset > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline {
+    flex: 1 1 200px;
+    min-width: 0;
+    display: block;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    background-color: #fff;
+    font-weight: normal;
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:hover {
+    border-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:has(input[type="radio"]:checked) {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+    box-shadow: inset 0 0 0 1px #0d6efd;
+}
+
+.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:has(input[type="radio"]:focus-visible) {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Visually hide the radio inputs themselves — keep them focusable for keyboard users. */
+.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Hide the empty-value sentinel radio entirely. */
+.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:has(input[type="radio"][value=""]) {
+    display: none;
+}
+
+.mform .submission_genaiuse_radio_title {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.mform .submission_genaiuse_radio_helper {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.65);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
 /* Stack the AI-detail field labels above their textareas, full-width within the card body.
    Targets are by fitem ID — Moodle propagates a `class` attr on form elements onto the wrapper
    row, which would add an unwanted border, so a class-based selector is not safe here. */
