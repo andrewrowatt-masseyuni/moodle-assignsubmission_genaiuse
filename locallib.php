@@ -493,14 +493,48 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $toolusegroup[] = $mform->createElement('editor', 'genaiuse_tooluse_editor', '', ['rows' => 15]);
         $mform->setType('genaiuse_tooluse_editor', PARAM_RAW);
 
+        // Site-wide template content — used both as the editor default for new submissions
+        // and as the payload appended by the "Add another tool" button on every submission.
+        $templatecontent = (string)get_config('assignsubmission_genaiuse', 'toolusetemplatecontent');
+
         // Set default tool use content from existing record or site-wide template.
         if ($existingrecord) {
             $data->genaiuse_tooluse_editor = ['text' => $existingrecord->tooluse ?? '', 'format' => FORMAT_HTML];
         } else {
-            $templatecontent = get_config('assignsubmission_genaiuse', 'toolusetemplatecontent');
             $mform->setDefault(
                 'genaiuse_tooluse_editor',
-                ['text' => $templatecontent ?? '', 'format' => FORMAT_HTML]
+                ['text' => $templatecontent, 'format' => FORMAT_HTML]
+            );
+        }
+
+        // Add another tool button — appends the template content to the editor on click. The
+        // template payload is stashed inside a hidden <template> element so we don't have to
+        // pass it through js_call_amd (which warns above ~1024 characters).
+        if ($templatecontent !== '') {
+            $templateelementid = 'genaiuse_tooluse_template_html';
+            $addtoolbtn = \html_writer::tag(
+                'button',
+                '+ ' . s(get_string('tooluse_add_another', 'assignsubmission_genaiuse')),
+                [
+                    'type' => 'button',
+                    'class' => 'btn btn-outline-secondary btn-sm submission_genaiuse_addtool',
+                    'data-editor-id' => 'id_genaiuse_tooluse_editor',
+                    'data-template-id' => $templateelementid,
+                ]
+            );
+            $hiddentpl = \html_writer::tag('template', $templatecontent, ['id' => $templateelementid]);
+            $toolusegroup[] = $mform->createElement(
+                'static',
+                'genaiuse_tooluse_addbutton',
+                '',
+                $addtoolbtn . $hiddentpl
+            );
+
+            global $PAGE;
+            $PAGE->requires->js_call_amd(
+                'assignsubmission_genaiuse/addtool',
+                'init',
+                ['.submission_genaiuse_addtool']
             );
         }
 

@@ -33,7 +33,7 @@
 
 .mform .submission_genaiuse_cardtitle {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 0;
 }
 
@@ -48,7 +48,7 @@
 .mform .submission_genaiuse_badge {
     display: inline-block;
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 0.2em 0.6em;
@@ -131,7 +131,7 @@
 }
 
 .mform .submission_genaiuse_radio_title {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 1rem;
     line-height: 1.3;
 }
