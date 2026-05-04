@@ -1,0 +1,117 @@
+@assignsubmission @assignsubmission_genaiuse
+Feature: Form validation for the Generative AI use statement
+  In order to ensure students provide a complete declaration
+  As a student
+  I am prevented from submitting an incomplete generative AI use statement
+
+  Background:
+    Given the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1        | 0        | 1         |
+    And the following "users" exist:
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@example.com |
+      | student1 | Student   | 1        | student1@example.com |
+    And the following "course enrolments" exist:
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
+    And the following "activity" exists:
+      | activity                            | assign          |
+      | course                               | C1              |
+      | name                                 | Test assignment |
+      | submissiondrafts                     | 0               |
+      | assignsubmission_genaiuse_enabled    | 1               |
+      | assignsubmission_onlinetext_enabled  | 1               |
+    And I change the window size to "large"
+
+  @javascript
+  Scenario: Submission cannot be saved without selecting an AI use option
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I press "Save changes"
+    Then I should see "Required" in the "#fgroup_id_error_genaiuse_aiused_group" "css_element"
+    And I should not see "No generative AI was used"
+    And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: AI Used selected without any details shows required errors on each AI field
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aitoolsused" "css_element"
+    And I should see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aiusecontext" "css_element"
+    And I should see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aicontentdesc" "css_element"
+    And I should see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aimodification" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: Partially completed AI Used details only triggers required errors on the empty fields
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I press "Save changes"
+    Then I should not see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aitoolsused" "css_element"
+    And I should not see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aiusecontext" "css_element"
+    And I should see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aicontentdesc" "css_element"
+    And I should see "This field is required. Use N/A if this field is not applicable." in the "#id_error_genaiuse_aimodification" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: Acknowledgement field is not shown when no acknowledgement content is configured
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    Then I should not see "Read the AI use acknowledgement"
+    And I should not see "I have read the acknowledgement above and agree to it."
+
+  @javascript
+  Scenario: Acknowledgement is required when AI Used is selected and acknowledgement content is configured
+    Given the following config values are set as admin:
+      | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
+    And I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
+    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
+    And I press "Save changes"
+    Then I should see "You must confirm that you have read the AI use acknowledgement." in the "#id_error_genaiuse_ack_confirmed" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: Submission succeeds once all AI fields and acknowledgement are completed
+    Given the following config values are set as admin:
+      | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
+    And I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
+    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
+    And I set the field "genaiuse_ack_confirmed" to "1"
+    And I press "Save changes"
+    And I am on the "Test assignment" Activity page
+    Then I should see "Generative AI was used"
+
+  @javascript
+  Scenario: Selecting No AI Used does not require any AI detail fields or acknowledgement
+    Given the following config values are set as admin:
+      | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
+    And I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My original submission."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I press "Save changes"
+    And I am on the "Test assignment" Activity page
+    Then I should see "No generative AI was used"
