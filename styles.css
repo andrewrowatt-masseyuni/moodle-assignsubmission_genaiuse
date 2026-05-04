@@ -16,6 +16,10 @@
         font-size: 90%;
         font-weight: 300;
     }
+
+    .col-form-label {
+        padding-top: 0;
+    }
 }
 
 .mform .submission_genaiuse_pageheading {

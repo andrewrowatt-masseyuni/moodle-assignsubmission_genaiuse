@@ -534,7 +534,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 '+ ' . s(get_string('tooluse_add_another', 'assignsubmission_genaiuse')),
                 [
                     'type' => 'button',
-                    'class' => 'btn btn-outline-secondary btn-sm submission_genaiuse_addtool',
+                    'class' => 'btn btn-primary btn-sm submission_genaiuse_addtool',
                     'data-editor-id' => 'id_genaiuse_tooluse_editor',
                     'data-template-id' => $templateelementid,
                 ]
@@ -620,12 +620,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         );
 
         $evidenceheadergroup = [];
+        /*
         $evidenceheadergroup[] = $mform->createElement(
             'static',
             'genaiuse_evidence_text1',
             '',
             \html_writer::tag('p', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'))
         );
+        */
 
         $fileoptions = $this->get_file_options();
         $data = file_prepare_standard_filemanager(
@@ -640,7 +642,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $evidenceheadergroup[] = $mform->createElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
 
-        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '<div class="w-100"></div>', false);
+        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'), '<div class="w-100"></div>', false);
         $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'eq', '');
 
         $mform->addElement('html', '</div></div>');
@@ -657,13 +659,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
             $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
             $onedriveelements = [];
-
+            /*
             $onedriveelements[] = $mform->createElement(
                 'static',
                 'onedrivelink_instructions',
                 '',
                 \html_writer::tag('p', get_string('onedrivelink', 'assignsubmission_genaiuse'))
             );
+            */
 
             $onedriveelements[] = $mform->createElement(
                 'text',
@@ -689,7 +692,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->addGroup(
                 $onedriveelements,
                 'genaiuse_onedrivelink_group',
-                '',
+                get_string('onedrivelink', 'assignsubmission_genaiuse'),
                 '<div class="w-100"></div>',
                 false
             );
