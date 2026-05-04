@@ -160,17 +160,18 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     }
 
     /**
-     * Count the number of evidence files for a submission.
+     * Count the number of files in a given file area for a submission.
      *
      * @param int $submissionid
+     * @param string $filearea The file area constant. Defaults to the evidence area.
      * @return int
      */
-    private function count_files($submissionid) {
+    private function count_files($submissionid, $filearea = ASSIGNSUBMISSION_GENAIUSE_FILEAREA) {
         $fs = get_file_storage();
         $files = $fs->get_area_files(
             $this->assignment->get_context()->id,
             'assignsubmission_genaiuse',
-            ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+            $filearea,
             $submissionid,
             'id',
             false
@@ -367,7 +368,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'genaiuse_aiused_group',
             get_string('genaiuse_declaration', 'assignsubmission_genaiuse'),
             '',
-            false
+            false,
+            ['class' => 'submission_genaiuse_radiocards']
         );
         $mform->addRule('genaiuse_aiused_group', get_string('required'), 'required', null, 'client');
 
@@ -467,37 +469,51 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             . '<div class="card-body">'
         );
 
-        $toolusegroup = [];
-
-        // Tool use description text (with optional Word template link).
         $templateurl = $this->get_template_moodle_url();
-        if ($templateurl !== null) {
-            $templatelink = \html_writer::link(
-                $templateurl,
-                get_string('tooluse_template_link', 'assignsubmission_genaiuse'),
-                ['target' => '_blank', 'rel' => 'noopener noreferrer']
-            );
-            $toolusedesc = get_string('tooluse_description', 'assignsubmission_genaiuse', $templatelink);
-        } else {
-            $toolusedesc = get_string('tooluse_description_notemplate', 'assignsubmission_genaiuse');
-        }
-
-        $toolusegroup[] = $mform->createElement(
-            'static',
-            'genaiuse_tooluse_desc',
-            '',
-            \html_writer::tag('p', $toolusedesc)
-        );
-
-        // Tool use richtext editor.
-        $toolusegroup[] = $mform->createElement('editor', 'genaiuse_tooluse_editor', '', ['rows' => 15]);
-        $mform->setType('genaiuse_tooluse_editor', PARAM_RAW);
-
         // Site-wide template content — used both as the editor default for new submissions
         // and as the payload appended by the "Add another tool" button on every submission.
         $templatecontent = (string)get_config('assignsubmission_genaiuse', 'toolusetemplatecontent');
 
-        // Set default tool use content from existing record or site-wide template.
+        // Method radio cards: Enter text / Upload document.
+        $toolusetextcard = $radiocard(
+            get_string('tooluse_method_text_title', 'assignsubmission_genaiuse'),
+            get_string('tooluse_method_text_helper', 'assignsubmission_genaiuse')
+        );
+        $tooluseuploadcard = $radiocard(
+            get_string('tooluse_method_upload_title', 'assignsubmission_genaiuse'),
+            get_string('tooluse_method_upload_helper', 'assignsubmission_genaiuse')
+        );
+
+        $toolusemethodradios = [];
+        $toolusemethodradios[] = $mform->createElement('radio', 'genaiuse_tooluse_method', '', '', '');
+        $toolusemethodradios[] = $mform->createElement(
+            'radio',
+            'genaiuse_tooluse_method',
+            '',
+            $toolusetextcard,
+            'text'
+        );
+        $toolusemethodradios[] = $mform->createElement(
+            'radio',
+            'genaiuse_tooluse_method',
+            '',
+            $tooluseuploadcard,
+            'upload'
+        );
+        $mform->addGroup(
+            $toolusemethodradios,
+            'genaiuse_tooluse_method_group',
+            get_string('tooluse_method_label', 'assignsubmission_genaiuse'),
+            '',
+            false,
+            ['class' => 'submission_genaiuse_radiocards']
+        );
+        $mform->hideIf('genaiuse_tooluse_method_group', 'genaiuse_aiused', 'neq', $aiusedstr);
+
+        // Tool use richtext editor (visible when method = 'text').
+        $mform->addElement('editor', 'genaiuse_tooluse_editor', '', ['rows' => 15]);
+        $mform->setType('genaiuse_tooluse_editor', PARAM_RAW);
+
         if ($existingrecord) {
             $data->genaiuse_tooluse_editor = ['text' => $existingrecord->tooluse ?? '', 'format' => FORMAT_HTML];
         } else {
@@ -506,10 +522,11 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 ['text' => $templatecontent, 'format' => FORMAT_HTML]
             );
         }
+        $mform->hideIf('genaiuse_tooluse_editor', 'genaiuse_aiused', 'neq', $aiusedstr);
+        $mform->hideIf('genaiuse_tooluse_editor', 'genaiuse_tooluse_method', 'neq', 'text');
 
-        // Add another tool button — appends the template content to the editor on click. The
-        // template payload is stashed inside a hidden <template> element so we don't have to
-        // pass it through js_call_amd (which warns above ~1024 characters).
+        // Add another tool button — appends template content to the editor (visible when method = 'text').
+        // Template payload stashed inside a hidden <template> element to avoid the js_call_amd 1024-char limit.
         if ($templatecontent !== '') {
             $templateelementid = 'genaiuse_tooluse_template_html';
             $addtoolbtn = \html_writer::tag(
@@ -523,12 +540,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 ]
             );
             $hiddentpl = \html_writer::tag('template', $templatecontent, ['id' => $templateelementid]);
-            $toolusegroup[] = $mform->createElement(
+            $mform->addElement(
                 'static',
                 'genaiuse_tooluse_addbutton',
                 '',
                 $addtoolbtn . $hiddentpl
             );
+            $mform->hideIf('genaiuse_tooluse_addbutton', 'genaiuse_aiused', 'neq', $aiusedstr);
+            $mform->hideIf('genaiuse_tooluse_addbutton', 'genaiuse_tooluse_method', 'neq', 'text');
 
             global $PAGE;
             $PAGE->requires->js_call_amd(
@@ -538,6 +557,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             );
         }
 
+        // Upload instructions (visible when method = 'upload', and only if a downloadable template exists).
         if ($templateurl !== null) {
             $tooluseuploadtext = get_string(
                 'tooluse_upload_text',
@@ -548,15 +568,17 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                     ['target' => '_blank', 'rel' => 'noopener noreferrer']
                 )
             );
-            $toolusegroup[] = $mform->createElement(
+            $mform->addElement(
                 'static',
                 'genaiuse_tooluse_upload_text',
                 '',
                 \html_writer::tag('p', $tooluseuploadtext)
             );
+            $mform->hideIf('genaiuse_tooluse_upload_text', 'genaiuse_aiused', 'neq', $aiusedstr);
+            $mform->hideIf('genaiuse_tooluse_upload_text', 'genaiuse_tooluse_method', 'neq', 'upload');
         }
 
-        // Tool use file manager.
+        // Tool use file manager (visible when method = 'upload').
         $submissionid = $submission ? $submission->id : 0;
         $toolusefileoptions = $this->get_file_options();
         $data = file_prepare_standard_filemanager(
@@ -569,15 +591,22 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $submissionid
         );
 
-        $toolusegroup[] = $mform->createElement('filemanager', 'genaiuse_tooluse_filemanager', '', null, $toolusefileoptions);
+        $mform->addElement('filemanager', 'genaiuse_tooluse_filemanager', '', null, $toolusefileoptions);
+        $mform->hideIf('genaiuse_tooluse_filemanager', 'genaiuse_aiused', 'neq', $aiusedstr);
+        $mform->hideIf('genaiuse_tooluse_filemanager', 'genaiuse_tooluse_method', 'neq', 'upload');
 
-        $mform->addGroup($toolusegroup, 'genaiuse_tooluse_heading_group', '', '<div class="w-100"></div>', false);
-        $mform->hideIf(
-            'genaiuse_tooluse_heading_group',
-            'genaiuse_aiused',
-            'neq',
-            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
-        );
+        // Pre-select the method on edit based on which kind of content already exists.
+        if ($existingrecord) {
+            if (!empty($existingrecord->tooluse)) {
+                $data->genaiuse_tooluse_method = 'text';
+            } else if ($this->count_files($existingrecord->submission, ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE) > 0) {
+                $data->genaiuse_tooluse_method = 'upload';
+            } else {
+                $data->genaiuse_tooluse_method = '';
+            }
+        } else {
+            $mform->setDefault('genaiuse_tooluse_method', '');
+        }
 
         $mform->addElement('html', '</div></div>');
 
@@ -691,6 +720,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 if ($hasack && empty($values['genaiuse_ack_confirmed'])) {
                     $errors['genaiuse_ack_confirmed'] = get_string('ack_required', 'assignsubmission_genaiuse');
                 }
+                if (empty($values['genaiuse_tooluse_method'])) {
+                    $errors['genaiuse_tooluse_method_group'] =
+                        get_string('tooluse_method_required', 'assignsubmission_genaiuse');
+                }
             }
             return empty($errors) ? true : $errors;
         });
@@ -710,41 +743,61 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     public function save(stdClass $submission, stdClass $data) {
         global $DB;
 
-        // Save evidence files.
         $fileoptions = $this->get_file_options();
+        $context = $this->assignment->get_context();
+
+        // Save evidence files (regardless of method).
         $data = file_postupdate_standard_filemanager(
             $data,
             'genaiuse_evidence',
             $fileoptions,
-            $this->assignment->get_context(),
+            $context,
             'assignsubmission_genaiuse',
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
             $submission->id
         );
 
-        // Save tool use files.
-        $data = file_postupdate_standard_filemanager(
-            $data,
-            'genaiuse_tooluse',
-            $fileoptions,
-            $this->assignment->get_context(),
-            'assignsubmission_genaiuse',
-            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
-            $submission->id
-        );
+        $aiused = (int)($data->genaiuse_aiused ?? ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
+        $method = (string)($data->genaiuse_tooluse_method ?? '');
+
+        // Tool use files: only save them when the user picked the "upload" method.
+        // For "text" method or non-AI submissions, clear any previously stored files
+        // so the saved record reflects the user's current choice.
+        if ($aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED && $method === 'upload') {
+            $data = file_postupdate_standard_filemanager(
+                $data,
+                'genaiuse_tooluse',
+                $fileoptions,
+                $context,
+                'assignsubmission_genaiuse',
+                ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+                $submission->id
+            );
+        } else {
+            get_file_storage()->delete_area_files(
+                $context->id,
+                'assignsubmission_genaiuse',
+                ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+                $submission->id
+            );
+        }
 
         $currentsubmission = $this->get_genaiuse_submission($submission->id);
 
         $record = new stdClass();
-        $record->aiused = (int)($data->genaiuse_aiused ?? ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
+        $record->aiused = $aiused;
 
         if ($record->aiused == ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
             $record->aitoolsused = $data->genaiuse_aitoolsused ?? '';
             $record->aiusecontext = $data->genaiuse_aiusecontext ?? '';
             $record->aicontentdesc = $data->genaiuse_aicontentdesc ?? '';
             $record->aimodification = $data->genaiuse_aimodification ?? '';
-            $tooluseraw = $data->genaiuse_tooluse_editor ?? null;
-            $record->tooluse = is_array($tooluseraw) ? ($tooluseraw['text'] ?? '') : ($tooluseraw ?? '');
+            if ($method === 'text') {
+                $tooluseraw = $data->genaiuse_tooluse_editor ?? null;
+                $record->tooluse = is_array($tooluseraw) ? ($tooluseraw['text'] ?? '') : ($tooluseraw ?? '');
+            } else {
+                $record->tooluse = '';
+            }
         } else {
             $record->aitoolsused = null;
             $record->aiusecontext = null;

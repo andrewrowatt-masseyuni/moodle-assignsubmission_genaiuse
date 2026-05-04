@@ -66,8 +66,8 @@
     background-color: #6c757d;
 }
 
-/* Hide a collapsible card whose only inner form group is hidden by hideIf. */
-.mform .submission_genaiuse_card_collapsible:has(> .card-body > .fitem[hidden]:only-child) {
+/* Hide a collapsible card when every .fitem inside its body is hidden by hideIf. */
+.mform .submission_genaiuse_card_collapsible:has(> .card-body > .fitem):not(:has(> .card-body > .fitem:not([hidden]))) {
     display: none;
 }
 
@@ -76,14 +76,16 @@
    is matched via :has(input:checked) on the label itself. A third sentinel radio with value=""
    is included to keep hideIf working when nothing is picked yet — see locallib.php — and is
    hidden from view here. */
-.mform #fgroup_id_genaiuse_aiused_group fieldset > div {
+.mform .submission_genaiuse_radiocards fieldset > div {
     display: flex;
     flex-wrap: wrap;
+    /* stylelint-disable-next-line declaration-no-important */
+    align-items: stretch !important;
     gap: 0.75rem;
     width: 100%;
 }
 
-.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline {
+.mform .submission_genaiuse_radiocards label.form-check-inline {
     flex: 1 1 200px;
     min-width: 0;
     display: block;
@@ -97,24 +99,24 @@
     transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
 }
 
-.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:hover {
+.mform .submission_genaiuse_radiocards label.form-check-inline:hover {
     border-color: rgba(0, 0, 0, 0.35);
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:has(input[type="radio"]:checked) {
+.mform .submission_genaiuse_radiocards label.form-check-inline:has(input[type="radio"]:checked) {
     border-color: #0d6efd;
     background-color: #e7f1ff;
     box-shadow: inset 0 0 0 1px #0d6efd;
 }
 
-.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:has(input[type="radio"]:focus-visible) {
+.mform .submission_genaiuse_radiocards label.form-check-inline:has(input[type="radio"]:focus-visible) {
     outline: 2px solid #0d6efd;
     outline-offset: 2px;
 }
 
 /* Visually hide the radio inputs themselves — keep them focusable for keyboard users. */
-.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline input[type="radio"] {
+.mform .submission_genaiuse_radiocards label.form-check-inline input[type="radio"] {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -126,7 +128,7 @@
 }
 
 /* Hide the empty-value sentinel radio entirely. */
-.mform #fgroup_id_genaiuse_aiused_group label.form-check-inline:has(input[type="radio"][value=""]) {
+.mform .submission_genaiuse_radiocards label.form-check-inline:has(input[type="radio"][value=""]) {
     display: none;
 }
 
