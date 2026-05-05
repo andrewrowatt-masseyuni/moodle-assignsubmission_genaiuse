@@ -1,15 +1,232 @@
-#fgroup_id_genaiuse_ai_prefix1_group,
-#fgroup_id_genaiuse_ai_prefix2_group,
-#fgroup_id_genaiuse_ai_prefix3_group,
-#fgroup_id_genaiuse_ai_prefix4_group {
-    padding-bottom: 0;
+.mform .submission_genaiuse.fcontainer {
+    > .fitem {
+        padding-top: 0;
+        padding-bottom: 0;
+
+        p {
+            margin: 0.125em 0;
+        }
+
+        font-size: 90%;
+        font-weight: 300;
+        line-height: 1.4;
+    }
+
+    ::placeholder {
+        font-size: 90%;
+        font-weight: 300;
+    }
+
+    .col-form-label {
+        padding-top: 0;
+    }
 }
 
-#fgroup_id_genaiuse_ai_prefix1_group + .fitem,
-#fgroup_id_genaiuse_ai_prefix2_group + .fitem,
-#fgroup_id_genaiuse_ai_prefix3_group + .fitem,
-#fgroup_id_genaiuse_ai_prefix4_group + .fitem {
-    padding-top: 0;
+.mform .submission_genaiuse_pageheading {
+    margin-bottom: 0.75rem;
+}
+
+.mform .submission_genaiuse_card {
+    margin-left: 0.5rem;
+}
+
+.mform .submission_genaiuse_card > .submission_genaiuse_cardheader {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 0.5rem 1rem;
+}
+
+.mform .submission_genaiuse_cardtitle {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.mform .submission_genaiuse_card_required {
+    border-left: 3px solid #dc3545;
+}
+
+.mform .submission_genaiuse_card_optional {
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+.mform .submission_genaiuse_badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.2em 0.6em;
+    border-radius: 0.375rem;
+    color: #fff;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.mform .submission_genaiuse_badge_required {
+    background-color: #dc3545;
+}
+
+.mform .submission_genaiuse_badge_optional {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+/* Hide a collapsible card when every .fitem inside its body is hidden by hideIf. */
+.mform .submission_genaiuse_card_collapsible:has(> .card-body > .fitem):not(:has(> .card-body > .fitem:not([hidden]))) {
+    display: none;
+}
+
+/* Two card-style radios for "AI Used" / "No AI Used". Moodle's grouped-radio template renders
+   each option as <label class="form-check-inline"> wrapping the <input>, so the selected state
+   is matched via :has(input:checked) on the label itself. A third sentinel radio with value=""
+   is included to keep hideIf working when nothing is picked yet — see locallib.php — and is
+   hidden from view here. */
+.mform .submission_genaiuse_radiocards fieldset > div {
+    display: flex;
+    flex-wrap: wrap;
+    /* stylelint-disable-next-line declaration-no-important */
+    align-items: stretch !important;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.mform .submission_genaiuse_radiocards label.form-check-inline {
+    flex: 1 1 200px;
+    min-width: 0;
+    display: block;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    background-color: #fff;
+    font-weight: normal;
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.mform .submission_genaiuse_radiocards label.form-check-inline:hover {
+    border-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.mform .submission_genaiuse_radiocards label.form-check-inline:has(input[type="radio"]:checked) {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+    box-shadow: inset 0 0 0 1px #0d6efd;
+}
+
+.mform .submission_genaiuse_radiocards label.form-check-inline:has(input[type="radio"]:focus-visible) {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Visually hide the radio inputs themselves — keep them focusable for keyboard users. */
+.mform .submission_genaiuse_radiocards label.form-check-inline input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Hide the empty-value sentinel radio entirely. */
+.mform .submission_genaiuse_radiocards label.form-check-inline:has(input[type="radio"][value=""]) {
+    display: none;
+}
+
+.mform .submission_genaiuse_radio_title {
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.mform .submission_genaiuse_radio_helper {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.65);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
+/* Stack the AI-detail field labels above their textareas, full-width within the card body.
+   Targets are by fitem ID — Moodle propagates a `class` attr on form elements onto the wrapper
+   row, which would add an unwanted border, so a class-based selector is not safe here. */
+.mform #fitem_id_genaiuse_aitoolsused,
+.mform #fitem_id_genaiuse_aiusecontext,
+.mform #fitem_id_genaiuse_aicontentdesc,
+.mform #fitem_id_genaiuse_aimodification,
+.mform #fitem_id_genaiuse_ai_ack_text {
+    display: block;
+}
+
+.mform #fitem_id_genaiuse_aitoolsused > .col-md-3,
+.mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
+.mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
+.mform #fitem_id_genaiuse_aimodification > .col-md-3,
+.mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
+.mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
+.mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
+.mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
+.mform #fitem_id_genaiuse_aimodification > .col-md-9,
+.mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* On md+ indent both stacked rows by 25% so they line up with col-md-9 content
+   in sibling cards (e.g. the Tool use card). */
+@media (min-width: 768px) {
+    .mform #fitem_id_genaiuse_aitoolsused > .col-md-3,
+    .mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
+    .mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
+    .mform #fitem_id_genaiuse_aimodification > .col-md-3,
+    .mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
+    .mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
+    .mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
+    .mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
+    .mform #fitem_id_genaiuse_aimodification > .col-md-9,
+    .mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+        margin-left: 25%;
+    }
+}
+
+.mform .submission_genaiuse_aifield_label {
+    font-weight: 500;
+}
+
+.mform .genaiuse_acknowledgement_details {
+    width: 100%;
+    margin: 0.5rem 0;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.375rem;
+}
+
+.mform .genaiuse_acknowledgement_details > summary {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.025);
+    border-radius: 0.375rem;
+}
+
+.mform .genaiuse_acknowledgement_details[open] > summary {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.mform .genaiuse_acknowledgement_details > .genaiuse_acknowledgement {
+    padding: 0.5rem 0.75rem;
+}
+
+.mform .genaiuse_acknowledgement_details > .genaiuse_acknowledgement > p:last-child {
+    margin-bottom: 0;
 }
 
 .alert.assignsubmission_genaiuse {

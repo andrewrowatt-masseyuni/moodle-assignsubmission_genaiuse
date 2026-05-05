@@ -35,8 +35,8 @@ Feature: Basic tests for Generative AI use statement
   Scenario: No AI use option is selected by default on a new submission
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
-    Then the "checked" attribute of "#id_genaiuse_aiused_1" "css_element" should not be set
-    And the "checked" attribute of "#id_genaiuse_aiused_0" "css_element" should not be set
+    Then "//input[@name='genaiuse_aiused' and @value='1' and @checked]" "xpath_element" should not exist
+    And "//input[@name='genaiuse_aiused' and @value='0' and @checked]" "xpath_element" should not exist
     And I should not see "I acknowledge that any undeclared use of generative AI"
     And I should not see "When using AI, I have ensured that the work produced"
 
@@ -45,10 +45,11 @@ Feature: Basic tests for Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
     And I set the field "Online text" to "This is my original submission text."
-    And I click on "No AI Used" "radio"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
     Then I should see "no generative AI tools or systems"
     And I should see "academic dishonesty"
-    When I press "Save changes"
+    When I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
+    And I press "Save changes"
     And I am on the "Test assignment" Activity page
     Then I should see "No generative AI was used"
 
@@ -57,11 +58,14 @@ Feature: Basic tests for Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
     And I set the field "Online text" to "This is my submission text with AI assistance."
-    And I click on "#id_genaiuse_aiused_1" "css_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
     And I set the field "genaiuse_aitoolsused" to "ChatGPT (https://chat.openai.com)"
     And I set the field "genaiuse_aiusecontext" to "brainstorming ideas and generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "an outline structure and sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote key sections and verified facts"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I am on the "Test assignment" Activity page
     Then I should see "Generative AI was used"
@@ -71,7 +75,8 @@ Feature: Basic tests for Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     And I press "Add submission"
     And I set the field "Online text" to "My original work."
-    And I click on "No AI Used" "radio"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I am on the "Test assignment" Activity page logged in as teacher1
@@ -83,11 +88,14 @@ Feature: Basic tests for Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     And I press "Add submission"
     And I set the field "Online text" to "My submission with AI help."
-    And I click on "#id_genaiuse_aiused_1" "css_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
     And I set the field "genaiuse_aitoolsused" to "ChatGPT"
     And I set the field "genaiuse_aiusecontext" to "generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote all sections"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I am on the "Test assignment" Activity page logged in as teacher1

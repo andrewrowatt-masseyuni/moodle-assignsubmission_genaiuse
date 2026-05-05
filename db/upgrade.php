@@ -42,5 +42,46 @@ function xmldb_assignsubmission_genaiuse_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026042301, 'assignsubmission', 'genaiuse');
     }
 
+    if ($oldversion < 2026042302) {
+        $table = new xmldb_table('assignsubmission_genaiuse');
+        $field = new xmldb_field('tooluse', XMLDB_TYPE_TEXT, null, null, null, null, null, 'onedrivelink');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026042302, 'assignsubmission', 'genaiuse');
+    }
+
+    if ($oldversion < 2026050501) {
+        $table = new xmldb_table('assignsubmission_genaiuse');
+
+        $evidencechoice = new xmldb_field('evidencechoice', XMLDB_TYPE_CHAR, '3', null, null, null, null, 'numfiles');
+        if (!$dbman->field_exists($table, $evidencechoice)) {
+            $dbman->add_field($table, $evidencechoice);
+        }
+
+        $onedrivelinkchoice = new xmldb_field(
+            'onedrivelinkchoice',
+            XMLDB_TYPE_CHAR,
+            '3',
+            null,
+            null,
+            null,
+            null,
+            'onedrivelink'
+        );
+        if (!$dbman->field_exists($table, $onedrivelinkchoice)) {
+            $dbman->add_field($table, $onedrivelinkchoice);
+        }
+
+        // Backfill: any existing record with files or a link must have implicitly answered "yes".
+        $DB->execute("UPDATE {assignsubmission_genaiuse} SET evidencechoice = 'yes' WHERE numfiles > 0");
+        $DB->execute(
+            "UPDATE {assignsubmission_genaiuse} SET onedrivelinkchoice = 'yes'
+             WHERE onedrivelink IS NOT NULL AND onedrivelink <> ''"
+        );
+
+        upgrade_plugin_savepoint(true, 2026050501, 'assignsubmission', 'genaiuse');
+    }
+
     return true;
 }
