@@ -392,10 +392,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $data->genaiuse_aicontentdesc = $existingrecord->aicontentdesc ?? '';
             $data->genaiuse_aimodification = $existingrecord->aimodification ?? '';
             $data->genaiuse_onedrivelink = $existingrecord->onedrivelink ?? '';
-            // Pre-tick the acknowledgement on edit if AI use was previously confirmed.
-            if ((int)$existingrecord->aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
-                $data->genaiuse_ack_confirmed = 1;
-            }
+            // Pre-tick the acknowledgement on edit — required for both AI use options.
+            $data->genaiuse_ack_confirmed = 1;
         } else {
             // Check the hidden sentinel radio so the field has a value (empty string) for
             // hideIf evaluation. Neither user-facing radio is pre-selected.
@@ -446,16 +444,15 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
 
         // Required acknowledgement checkbox — top-level so its inline error displays correctly.
-        if ($hasack) {
-            $mform->addElement(
-                'advcheckbox',
-                'genaiuse_ack_confirmed',
-                '',
-                get_string('ack_confirm', 'assignsubmission_genaiuse')
-            );
-            $mform->setType('genaiuse_ack_confirmed', PARAM_INT);
-            $mform->hideIf('genaiuse_ack_confirmed', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
-        }
+        // Shown for both AI Used and No AI Used; hidden only until the user picks one.
+        $mform->addElement(
+            'advcheckbox',
+            'genaiuse_ack_confirmed',
+            '',
+            get_string('ack_confirm', 'assignsubmission_genaiuse')
+        );
+        $mform->setType('genaiuse_ack_confirmed', PARAM_INT);
+        $mform->hideIf('genaiuse_ack_confirmed', 'genaiuse_aiused', 'eq', '');
 
         // Close declaration card (card-body + card).
         $mform->addElement('html', '</div></div>');
@@ -775,12 +772,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->addElement('html', '</div></div>');
         }
 
-        // Conditional validation: require AI detail fields and acknowledgement only when AI is used.
-        // The evidence and OneDrive choice radios are required whenever their cards are visible
-        // (i.e. once aiused has been chosen) — picking yes/no is required even though the
+        // Conditional validation: AI detail fields are only required when AI is used. The
+        // acknowledgement, evidence, and OneDrive choice fields are required whenever an
+        // aiused option has been picked — picking yes/no is required even though the
         // file/link content itself remains optional.
         $onedriveenabled = !empty($this->get_config('onedrivelinkenabled'));
-        $mform->addFormRule(function ($values) use ($requiredrule, $hasack, $onedriveenabled) {
+        $mform->addFormRule(function ($values) use ($requiredrule, $onedriveenabled) {
             $errors = [];
             $aiused = $values['genaiuse_aiused'] ?? '';
             if ((int)$aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
@@ -796,15 +793,15 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                         $errors[$field] = $requiredrule;
                     }
                 }
-                if ($hasack && empty($values['genaiuse_ack_confirmed'])) {
-                    $errors['genaiuse_ack_confirmed'] = get_string('ack_required', 'assignsubmission_genaiuse');
-                }
                 if (empty($values['genaiuse_tooluse_method'])) {
                     $errors['genaiuse_tooluse_method_group'] =
                         get_string('tooluse_method_required', 'assignsubmission_genaiuse');
                 }
             }
             if ($aiused !== '') {
+                if (empty($values['genaiuse_ack_confirmed'])) {
+                    $errors['genaiuse_ack_confirmed'] = get_string('ack_required', 'assignsubmission_genaiuse');
+                }
                 if (empty($values['genaiuse_evidence_choice'])) {
                     $errors['genaiuse_evidence_choice_group'] =
                         get_string('supportingevidence_choice_required', 'assignsubmission_genaiuse');
@@ -991,64 +988,88 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $fullname = fullname($user);
         $result = '';
 
+        $result .= \html_writer::tag(
+            'h4',
+            get_string('genaiuse_declaration', 'assignsubmission_genaiuse')
+        );
+
         if ($record->aiused == ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED) {
-            $result .= \html_writer::tag('p', get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname));
-            $result .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'));
-            $result .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'));
+            $result .= \html_writer::tag(
+                'p',
+                get_string('noaiused', 'assignsubmission_genaiuse')
+            );
         } else {
             $result .= \html_writer::tag(
                 'p',
-                get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname) . ' '
-                . \html_writer::tag('strong', s($record->aitoolsused))
+                get_string('aiused', 'assignsubmission_genaiuse')
+            );
+            $result .= \html_writer::tag(
+                'i',
+                get_string('ai_placeholder_tools', 'assignsubmission_genaiuse')
             );
             $result .= \html_writer::tag(
                 'p',
-                get_string('ai_prefix_context', 'assignsubmission_genaiuse') . ' '
-                . \html_writer::tag('strong', s($record->aiusecontext))
+                s($record->aitoolsused)
+            );
+
+            $result .= \html_writer::tag(
+                'i',
+                get_string('ai_placeholder_context', 'assignsubmission_genaiuse')
             );
             $result .= \html_writer::tag(
                 'p',
-                get_string('ai_prefix_content', 'assignsubmission_genaiuse') . ' '
-                . \html_writer::tag('strong', s($record->aicontentdesc))
+                s($record->aiusecontext)
+            );
+
+            $result .= \html_writer::tag(
+                'i',
+                get_string('ai_placeholder_content', 'assignsubmission_genaiuse')
             );
             $result .= \html_writer::tag(
                 'p',
-                get_string('ai_prefix_modification', 'assignsubmission_genaiuse') . ' '
-                . \html_writer::tag('strong', s($record->aimodification))
+                s($record->aicontentdesc)
             );
 
-            $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
-            if ((string)$ackcontent !== '') {
-                $result .= \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement']);
-            }
+            $result .= \html_writer::tag(
+                'i',
+                get_string('ai_placeholder_modification', 'assignsubmission_genaiuse')
+            );
+            $result .= \html_writer::tag(
+                'p',
+                s($record->aimodification)
+            );
 
-            // Tool use template download link.
-            $templatehtml = $this->get_template_download_html();
-            if (!empty($templatehtml)) {
-                $result .= $templatehtml;
-            }
-
-            if (!empty($record->evidencechoice) || $record->numfiles > 0) {
-                $result .= \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'));
-                if (!empty($record->evidencechoice)) {
-                    $result .= \html_writer::tag(
-                        'p',
-                        \html_writer::tag('strong', get_string($record->evidencechoice))
-                    );
-                }
-                if ($record->numfiles > 0) {
-                    $result .= $this->assignment->render_area_files(
-                        'assignsubmission_genaiuse',
-                        ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
-                        $submission->id
-                    );
-                }
-            }
+            $result .= \html_writer::tag('h4', get_string('tooluse_heading', 'assignsubmission_genaiuse'));
 
             // Tool use richtext field.
             if (!empty($record->tooluse)) {
-                $result .= \html_writer::tag('h4', get_string('tooluse_heading', 'assignsubmission_genaiuse'));
-                $result .= format_text($record->tooluse, FORMAT_HTML);
+                $result .= \html_writer::tag(
+                    'div',
+                    format_text($record->tooluse, FORMAT_HTML),
+                    ['class' => 'genaiuse_tooluse_text']
+                );
+            }
+
+            $result .= $this->assignment->render_area_files(
+                'assignsubmission_genaiuse',
+                ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+                $submission->id
+            );
+        }
+
+        $result .= \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'));
+        $result .= \html_writer::tag(
+            'p',
+            \html_writer::tag('strong', get_string($record->evidencechoice))
+        );
+
+        if ($record->evidencechoice == 'yes') {
+            if ($record->numfiles > 0) {
+                $result .= $this->assignment->render_area_files(
+                    'assignsubmission_genaiuse',
+                    ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+                    $submission->id
+                );
             }
         }
 
@@ -1063,8 +1084,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             if (!empty($record->onedrivelink)) {
                 $result .= \html_writer::tag(
                     'p',
-                    get_string('onedrivelink', 'assignsubmission_genaiuse') . ': '
-                        . \html_writer::link($record->onedrivelink, s($record->onedrivelink))
+                    \html_writer::link($record->onedrivelink, s($record->onedrivelink), ['target' => '_blank'])
                 );
             }
         }

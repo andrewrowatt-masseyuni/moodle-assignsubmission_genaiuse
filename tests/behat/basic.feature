@@ -20,6 +20,7 @@ Feature: Basic tests for Generative AI use statement
       | submissiondrafts                    | 0               |
       | assignsubmission_genaiuse_enabled   | 1               |
       | assignsubmission_onlinetext_enabled | 1               |
+      | assignsubmission_genaiuse_onedrivelink  | 0                     |
 
     And I change the window size to "large"
 
@@ -48,6 +49,7 @@ Feature: Basic tests for Generative AI use statement
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
     Then I should see "no generative AI tools or systems"
     And I should see "academic dishonesty"
+    And I set the field "genaiuse_ack_confirmed" to "1"
     When I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I am on the "Test assignment" Activity page
@@ -63,6 +65,7 @@ Feature: Basic tests for Generative AI use statement
     And I set the field "genaiuse_aiusecontext" to "brainstorming ideas and generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "an outline structure and sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote key sections and verified facts"
+    And I set the field "genaiuse_ack_confirmed" to "1"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
     And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
@@ -76,6 +79,7 @@ Feature: Basic tests for Generative AI use statement
     And I press "Add submission"
     And I set the field "Online text" to "My original work."
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I set the field "genaiuse_ack_confirmed" to "1"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
@@ -93,6 +97,7 @@ Feature: Basic tests for Generative AI use statement
     And I set the field "genaiuse_aiusecontext" to "generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote all sections"
+    And I set the field "genaiuse_ack_confirmed" to "1"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
     And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
