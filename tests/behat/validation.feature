@@ -69,7 +69,9 @@ Feature: Form validation for the Generative AI use statement
     When I press "Add submission"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
     Then I should not see "Read the AI use acknowledgement"
-    And I should not see "I have read the acknowledgement above and agree to it."
+    When I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    Then I should not see "Read the AI use acknowledgement"
+    And I should see "I have read the acknowledgement above and agree to it."
 
   @javascript
   Scenario: Acknowledgement is required when AI Used is selected and acknowledgement content is configured
@@ -86,6 +88,20 @@ Feature: Form validation for the Generative AI use statement
     And I press "Save changes"
     Then I should see "You must confirm that you have read the AI use acknowledgement." in the "#id_error_genaiuse_ack_confirmed" "css_element"
     And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: Acknowledgement is required when No AI Used is selected and acknowledgement content is configured
+    Given the following config values are set as admin:
+      | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
+    And I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My original submission."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I should see "I have read the acknowledgement above and agree to it."
+    When I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "You must confirm that you have read the AI use acknowledgement." in the "#id_error_genaiuse_ack_confirmed" "css_element"
+    And I should not see "No generative AI was used"
 
   @javascript
   Scenario: Submission succeeds once all AI fields and acknowledgement are completed
@@ -108,13 +124,14 @@ Feature: Form validation for the Generative AI use statement
     Then I should see "Generative AI was used"
 
   @javascript
-  Scenario: Selecting No AI Used does not require any AI detail fields or acknowledgement
+  Scenario: Selecting No AI Used does not require AI detail fields and succeeds once the acknowledgement is ticked
     Given the following config values are set as admin:
       | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
     And I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
     And I set the field "Online text" to "My original submission."
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I set the field "genaiuse_ack_confirmed" to "1"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I am on the "Test assignment" Activity page
