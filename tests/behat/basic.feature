@@ -48,7 +48,8 @@ Feature: Basic tests for Generative AI use statement
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
     Then I should see "no generative AI tools or systems"
     And I should see "academic dishonesty"
-    When I press "Save changes"
+    When I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
+    And I press "Save changes"
     And I am on the "Test assignment" Activity page
     Then I should see "No generative AI was used"
 
@@ -62,6 +63,9 @@ Feature: Basic tests for Generative AI use statement
     And I set the field "genaiuse_aiusecontext" to "brainstorming ideas and generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "an outline structure and sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote key sections and verified facts"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I am on the "Test assignment" Activity page
     Then I should see "Generative AI was used"
@@ -72,6 +76,7 @@ Feature: Basic tests for Generative AI use statement
     And I press "Add submission"
     And I set the field "Online text" to "My original work."
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I am on the "Test assignment" Activity page logged in as teacher1
@@ -88,6 +93,9 @@ Feature: Basic tests for Generative AI use statement
     And I set the field "genaiuse_aiusecontext" to "generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote all sections"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I am on the "Test assignment" Activity page logged in as teacher1

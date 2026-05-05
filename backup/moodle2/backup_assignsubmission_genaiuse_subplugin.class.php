@@ -35,7 +35,8 @@ class backup_assignsubmission_genaiuse_subplugin extends backup_subplugin {
 
         $subpluginelement = new backup_nested_element('submission_genaiuse', null, [
             'submission', 'aiused', 'aitoolsused', 'aiusecontext',
-            'aicontentdesc', 'aimodification', 'numfiles', 'onedrivelink',
+            'aicontentdesc', 'aimodification', 'numfiles', 'evidencechoice',
+            'onedrivelink', 'onedrivelinkchoice', 'tooluse',
         ]);
 
         // Connect XML elements into the tree.

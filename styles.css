@@ -67,7 +67,8 @@
 }
 
 .mform .submission_genaiuse_badge_optional {
-    background-color: #6c757d;
+    background-color: #ffc107;
+    color: #212529;
 }
 
 /* Hide a collapsible card when every .fitem inside its body is hidden by hideIf. */

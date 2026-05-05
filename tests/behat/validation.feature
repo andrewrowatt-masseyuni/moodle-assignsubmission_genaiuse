@@ -100,6 +100,9 @@ Feature: Form validation for the Generative AI use statement
     And I set the field "genaiuse_aicontentdesc" to "Outline structure"
     And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
     And I set the field "genaiuse_ack_confirmed" to "1"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I am on the "Test assignment" Activity page
     Then I should see "Generative AI was used"
@@ -112,6 +115,17 @@ Feature: Form validation for the Generative AI use statement
     When I press "Add submission"
     And I set the field "Online text" to "My original submission."
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I am on the "Test assignment" Activity page
     Then I should see "No generative AI was used"
+
+  @javascript
+  Scenario: Supporting evidence Yes/No choice is required when AI use has been declared
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My original submission."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "Please choose whether you have supporting evidence to upload." in the "#fgroup_id_error_genaiuse_evidence_choice_group" "css_element"
+    And I should not see "No generative AI was used"

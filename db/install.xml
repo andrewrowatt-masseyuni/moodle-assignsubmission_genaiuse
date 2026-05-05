@@ -15,7 +15,9 @@
         <FIELD NAME="aicontentdesc" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of content used in task from AI tools."/>
         <FIELD NAME="aimodification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="How the AI output was modified."/>
         <FIELD NAME="numfiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of supporting evidence files."/>
+        <FIELD NAME="evidencechoice" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Student answer to the supporting-evidence Yes/No question: 'yes', 'no', or NULL when not chosen."/>
         <FIELD NAME="onedrivelink" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false" COMMENT="Optional OneDrive link to the student's final submission."/>
+        <FIELD NAME="onedrivelinkchoice" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Student answer to the OneDrive link Yes/No question: 'yes', 'no', or NULL when not chosen."/>
         <FIELD NAME="tooluse" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Richtext description of generative AI tool use entered directly in the submission form."/>
       </FIELDS>
       <KEYS>

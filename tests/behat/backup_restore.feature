@@ -33,6 +33,7 @@ Feature: Backup and restore of assignments with Generative AI use statement subm
     And I press "Add submission"
     And I set the field "Online text" to "My original work without AI."
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I log in as "admin"
@@ -56,6 +57,9 @@ Feature: Backup and restore of assignments with Generative AI use statement subm
     And I set the field "genaiuse_aiusecontext" to "generating draft text"
     And I set the field "genaiuse_aicontentdesc" to "sample paragraphs"
     And I set the field "genaiuse_aimodification" to "rewrote all sections"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I log in as "admin"

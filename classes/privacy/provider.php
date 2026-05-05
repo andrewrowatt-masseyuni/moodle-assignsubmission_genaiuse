@@ -61,6 +61,9 @@ class provider implements
             'aiusecontext' => 'privacy:metadata:aiusecontext',
             'aicontentdesc' => 'privacy:metadata:aicontentdesc',
             'aimodification' => 'privacy:metadata:aimodification',
+            'evidencechoice' => 'privacy:metadata:evidencechoice',
+            'onedrivelink' => 'privacy:metadata:onedrivelink',
+            'onedrivelinkchoice' => 'privacy:metadata:onedrivelinkchoice',
             'tooluse' => 'privacy:metadata:tooluse',
         ];
         $collection->add_database_table('assignsubmission_genaiuse', $detail, 'privacy:metadata:tablepurpose');
@@ -123,6 +126,9 @@ class provider implements
             $submissiondata->aiusecontext = $record->aiusecontext ?? '';
             $submissiondata->aicontentdesc = $record->aicontentdesc ?? '';
             $submissiondata->aimodification = $record->aimodification ?? '';
+            $submissiondata->evidencechoice = $record->evidencechoice ?? '';
+            $submissiondata->onedrivelink = $record->onedrivelink ?? '';
+            $submissiondata->onedrivelinkchoice = $record->onedrivelinkchoice ?? '';
             $submissiondata->tooluse = $record->tooluse ?? '';
 
             writer::with_context($context)

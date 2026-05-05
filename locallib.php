@@ -610,7 +610,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $mform->addElement('html', '</div></div>');
 
-        // Card 3: Supporting evidence (optional).
+        // Card 3: Supporting evidence (optional). Yes/No radio cards reveal the file manager.
         $mform->addElement(
             'html',
             '<div class="card submission_genaiuse_card submission_genaiuse_card_optional'
@@ -619,15 +619,37 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             . '<div class="card-body">'
         );
 
-        $evidenceheadergroup = [];
-        /*
-        $evidenceheadergroup[] = $mform->createElement(
-            'static',
-            'genaiuse_evidence_text1',
+        $evidencechoiceradios = [];
+        $evidencechoiceradios[] = $mform->createElement('radio', 'genaiuse_evidence_choice', '', '', '');
+        $evidencechoiceradios[] = $mform->createElement(
+            'radio',
+            'genaiuse_evidence_choice',
             '',
-            \html_writer::tag('p', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'))
+            $radiocard(
+                get_string('supportingevidence_yes_title', 'assignsubmission_genaiuse'),
+                get_string('supportingevidence_yes_helper', 'assignsubmission_genaiuse')
+            ),
+            'yes'
         );
-        */
+        $evidencechoiceradios[] = $mform->createElement(
+            'radio',
+            'genaiuse_evidence_choice',
+            '',
+            $radiocard(
+                get_string('supportingevidence_no_title', 'assignsubmission_genaiuse'),
+                get_string('supportingevidence_no_helper', 'assignsubmission_genaiuse')
+            ),
+            'no'
+        );
+        $mform->addGroup(
+            $evidencechoiceradios,
+            'genaiuse_evidence_choice_group',
+            get_string('supportingevidence_choice_label', 'assignsubmission_genaiuse'),
+            '',
+            false,
+            ['class' => 'submission_genaiuse_radiocards']
+        );
+        $mform->hideIf('genaiuse_evidence_choice_group', 'genaiuse_aiused', 'eq', '');
 
         $fileoptions = $this->get_file_options();
         $data = file_prepare_standard_filemanager(
@@ -640,10 +662,28 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $submissionid
         );
 
-        $evidenceheadergroup[] = $mform->createElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
+        $mform->addElement(
+            'filemanager',
+            'genaiuse_evidence_filemanager',
+            get_string('supportingevidence_uploadlabel', 'assignsubmission_genaiuse'),
+            null,
+            $fileoptions
+        );
+        $mform->hideIf('genaiuse_evidence_filemanager', 'genaiuse_aiused', 'eq', '');
+        $mform->hideIf('genaiuse_evidence_filemanager', 'genaiuse_evidence_choice', 'neq', 'yes');
 
-        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'), '<div class="w-100"></div>', false);
-        $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'eq', '');
+        // Pre-select choice on edit from the saved value. Pre-2026050501 records have NULL here;
+        // fall back to the file area so legacy submissions that contained files still load as "yes".
+        if ($existingrecord) {
+            if (!empty($existingrecord->evidencechoice)) {
+                $data->genaiuse_evidence_choice = $existingrecord->evidencechoice;
+            } else {
+                $hasfiles = $this->count_files($existingrecord->submission, ASSIGNSUBMISSION_GENAIUSE_FILEAREA) > 0;
+                $data->genaiuse_evidence_choice = $hasfiles ? 'yes' : '';
+            }
+        } else {
+            $mform->setDefault('genaiuse_evidence_choice', '');
+        }
 
         $mform->addElement('html', '</div></div>');
 
@@ -657,16 +697,40 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 . '<div class="card-body">'
             );
 
+            $onedrivechoiceradios = [];
+            $onedrivechoiceradios[] = $mform->createElement('radio', 'genaiuse_onedrivelink_choice', '', '', '');
+            $onedrivechoiceradios[] = $mform->createElement(
+                'radio',
+                'genaiuse_onedrivelink_choice',
+                '',
+                $radiocard(
+                    get_string('onedrivelink_yes_title', 'assignsubmission_genaiuse'),
+                    get_string('onedrivelink_yes_helper', 'assignsubmission_genaiuse')
+                ),
+                'yes'
+            );
+            $onedrivechoiceradios[] = $mform->createElement(
+                'radio',
+                'genaiuse_onedrivelink_choice',
+                '',
+                $radiocard(
+                    get_string('onedrivelink_no_title', 'assignsubmission_genaiuse'),
+                    get_string('onedrivelink_no_helper', 'assignsubmission_genaiuse')
+                ),
+                'no'
+            );
+            $mform->addGroup(
+                $onedrivechoiceradios,
+                'genaiuse_onedrivelink_choice_group',
+                get_string('onedrivelink_choice_label', 'assignsubmission_genaiuse'),
+                '',
+                false,
+                ['class' => 'submission_genaiuse_radiocards']
+            );
+            $mform->hideIf('genaiuse_onedrivelink_choice_group', 'genaiuse_aiused', 'eq', '');
+
             $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
             $onedriveelements = [];
-            /*
-            $onedriveelements[] = $mform->createElement(
-                'static',
-                'onedrivelink_instructions',
-                '',
-                \html_writer::tag('p', get_string('onedrivelink', 'assignsubmission_genaiuse'))
-            );
-            */
 
             $onedriveelements[] = $mform->createElement(
                 'text',
@@ -697,17 +761,29 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 false
             );
             $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_aiused', 'eq', '');
+            $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_onedrivelink_choice', 'neq', 'yes');
+
+            // Pre-select choice on edit from the saved value. Pre-2026050501 records have NULL here;
+            // fall back to the link presence so legacy submissions still load as "yes".
+            if ($existingrecord) {
+                $legacychoice = empty($existingrecord->onedrivelink) ? '' : 'yes';
+                $data->genaiuse_onedrivelink_choice = $existingrecord->onedrivelinkchoice ?: $legacychoice;
+            } else {
+                $mform->setDefault('genaiuse_onedrivelink_choice', '');
+            }
 
             $mform->addElement('html', '</div></div>');
         }
 
         // Conditional validation: require AI detail fields and acknowledgement only when AI is used.
-        $mform->addFormRule(function ($values) use ($requiredrule, $hasack) {
+        // The evidence and OneDrive choice radios are required whenever their cards are visible
+        // (i.e. once aiused has been chosen) — picking yes/no is required even though the
+        // file/link content itself remains optional.
+        $onedriveenabled = !empty($this->get_config('onedrivelinkenabled'));
+        $mform->addFormRule(function ($values) use ($requiredrule, $hasack, $onedriveenabled) {
             $errors = [];
-            if (
-                isset($values['genaiuse_aiused'])
-                    && (int)$values['genaiuse_aiused'] === ASSIGNSUBMISSION_GENAIUSE_AI_USED
-            ) {
+            $aiused = $values['genaiuse_aiused'] ?? '';
+            if ((int)$aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
                 foreach (
                     [
                     'genaiuse_aitoolsused',
@@ -726,6 +802,16 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 if (empty($values['genaiuse_tooluse_method'])) {
                     $errors['genaiuse_tooluse_method_group'] =
                         get_string('tooluse_method_required', 'assignsubmission_genaiuse');
+                }
+            }
+            if ($aiused !== '') {
+                if (empty($values['genaiuse_evidence_choice'])) {
+                    $errors['genaiuse_evidence_choice_group'] =
+                        get_string('supportingevidence_choice_required', 'assignsubmission_genaiuse');
+                }
+                if ($onedriveenabled && empty($values['genaiuse_onedrivelink_choice'])) {
+                    $errors['genaiuse_onedrivelink_choice_group'] =
+                        get_string('onedrivelink_choice_required', 'assignsubmission_genaiuse');
                 }
             }
             return empty($errors) ? true : $errors;
@@ -749,16 +835,26 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $fileoptions = $this->get_file_options();
         $context = $this->assignment->get_context();
 
-        // Save evidence files (regardless of method).
-        $data = file_postupdate_standard_filemanager(
-            $data,
-            'genaiuse_evidence',
-            $fileoptions,
-            $context,
-            'assignsubmission_genaiuse',
-            ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
-            $submission->id
-        );
+        // Evidence files: clear if user explicitly chose "no", otherwise save what's in the form.
+        $evidencechoice = $data->genaiuse_evidence_choice ?? null;
+        if ($evidencechoice === 'no') {
+            get_file_storage()->delete_area_files(
+                $context->id,
+                'assignsubmission_genaiuse',
+                ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+                $submission->id
+            );
+        } else {
+            $data = file_postupdate_standard_filemanager(
+                $data,
+                'genaiuse_evidence',
+                $fileoptions,
+                $context,
+                'assignsubmission_genaiuse',
+                ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+                $submission->id
+            );
+        }
 
         $aiused = (int)($data->genaiuse_aiused ?? ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
         $method = (string)($data->genaiuse_tooluse_method ?? '');
@@ -810,13 +906,19 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
 
         $record->numfiles = $this->count_files($submission->id);
+        $record->evidencechoice = in_array($evidencechoice, ['yes', 'no'], true) ? $evidencechoice : null;
 
-        if (!empty($this->get_config('onedrivelinkenabled'))) {
+        $onedrivechoice = $data->genaiuse_onedrivelink_choice ?? null;
+        if (!empty($this->get_config('onedrivelinkenabled')) && $onedrivechoice !== 'no') {
             $link = trim((string)($data->genaiuse_onedrivelink ?? ''));
             $record->onedrivelink = $link === '' ? null : $link;
         } else {
             $record->onedrivelink = null;
         }
+        $record->onedrivelinkchoice = !empty($this->get_config('onedrivelinkenabled'))
+                && in_array($onedrivechoice, ['yes', 'no'], true)
+            ? $onedrivechoice
+            : null;
 
         if ($currentsubmission) {
             $record->id = $currentsubmission->id;
@@ -926,13 +1028,21 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 $result .= $templatehtml;
             }
 
-            if ($record->numfiles > 0) {
+            if (!empty($record->evidencechoice) || $record->numfiles > 0) {
                 $result .= \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'));
-                $result .= $this->assignment->render_area_files(
-                    'assignsubmission_genaiuse',
-                    ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
-                    $submission->id
-                );
+                if (!empty($record->evidencechoice)) {
+                    $result .= \html_writer::tag(
+                        'p',
+                        \html_writer::tag('strong', get_string($record->evidencechoice))
+                    );
+                }
+                if ($record->numfiles > 0) {
+                    $result .= $this->assignment->render_area_files(
+                        'assignsubmission_genaiuse',
+                        ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+                        $submission->id
+                    );
+                }
             }
 
             // Tool use richtext field.
@@ -942,12 +1052,21 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             }
         }
 
-        if (!empty($record->onedrivelink)) {
-            $result .= \html_writer::tag(
-                'p',
-                get_string('onedrivelink', 'assignsubmission_genaiuse') . ': '
-                    . \html_writer::link($record->onedrivelink, s($record->onedrivelink))
-            );
+        if (!empty($record->onedrivelinkchoice) || !empty($record->onedrivelink)) {
+            $result .= \html_writer::tag('h4', get_string('onedrive', 'assignsubmission_genaiuse'));
+            if (!empty($record->onedrivelinkchoice)) {
+                $result .= \html_writer::tag(
+                    'p',
+                    \html_writer::tag('strong', get_string($record->onedrivelinkchoice))
+                );
+            }
+            if (!empty($record->onedrivelink)) {
+                $result .= \html_writer::tag(
+                    'p',
+                    get_string('onedrivelink', 'assignsubmission_genaiuse') . ': '
+                        . \html_writer::link($record->onedrivelink, s($record->onedrivelink))
+                );
+            }
         }
 
         return $result;

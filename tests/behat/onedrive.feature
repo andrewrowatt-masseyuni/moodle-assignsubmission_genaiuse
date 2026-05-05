@@ -46,6 +46,7 @@ Feature: OneDrive link submission field for Generative AI use statement
     And I press "Add submission"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
     And I should see "OneDrive link"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Yes, I have a OneDrive link']" "xpath_element"
     And I should see "How to create a OneDrive link"
 
   @javascript
@@ -62,6 +63,8 @@ Feature: OneDrive link submission field for Generative AI use statement
     When I press "Add submission"
     And I set the field "Online text" to "My draft submission."
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Yes, I have a OneDrive link']" "xpath_element"
     And I set the field "genaiuse_onedrivelink" to "https://example.com/onedrive/share/abc"
     And I press "Save changes"
     Then I should see "No generative AI was used"
