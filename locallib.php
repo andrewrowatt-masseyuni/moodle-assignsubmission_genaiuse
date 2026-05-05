@@ -180,6 +180,57 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     }
 
     /**
+     * Determine whether an editor value is effectively empty.
+     *
+     * @param mixed $editorvalue
+     * @return bool
+     */
+    private function is_editor_content_empty($editorvalue) {
+        if (is_array($editorvalue)) {
+            $editorvalue = $editorvalue['text'] ?? '';
+        }
+
+        $text = (string)$editorvalue;
+        $text = str_replace('&nbsp;', ' ', $text);
+        $text = strip_tags($text);
+        $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+        $text = preg_replace('/\\x{00A0}/u', ' ', $text);
+        if ($text === null) {
+            $text = '';
+        }
+
+        return trim($text) === '';
+    }
+
+    /**
+     * Count files in a user's draft area item.
+     *
+     * @param int $draftitemid
+     * @return int
+     */
+    private function count_draft_files($draftitemid) {
+        global $USER;
+
+        $draftitemid = (int)$draftitemid;
+        if ($draftitemid <= 0) {
+            return 0;
+        }
+
+        $fs = get_file_storage();
+        $usercontext = \context_user::instance($USER->id);
+        $files = $fs->get_area_files(
+            $usercontext->id,
+            'user',
+            'draft',
+            $draftitemid,
+            'id',
+            false
+        );
+
+        return count($files);
+    }
+
+    /**
      * Get the default setting for this plugin in the assignment settings form.
      *
      * @param MoodleQuickForm $mform
@@ -773,9 +824,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
 
         // Conditional validation: AI detail fields are only required when AI is used. The
-        // acknowledgement, evidence, and OneDrive choice fields are required whenever an
-        // aiused option has been picked — picking yes/no is required even though the
-        // file/link content itself remains optional.
+        // selected tool use method must include content (non-empty editor text or at least
+        // one uploaded file). The acknowledgement, evidence, and OneDrive choice fields are
+        // required whenever an aiused option has been picked.
         $onedriveenabled = !empty($this->get_config('onedrivelinkenabled'));
         $mform->addFormRule(function ($values) use ($requiredrule, $onedriveenabled) {
             $errors = [];
@@ -793,9 +844,22 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                         $errors[$field] = $requiredrule;
                     }
                 }
-                if (empty($values['genaiuse_tooluse_method'])) {
+                $toolusemethod = (string)($values['genaiuse_tooluse_method'] ?? '');
+                if ($toolusemethod === '') {
                     $errors['genaiuse_tooluse_method_group'] =
                         get_string('tooluse_method_required', 'assignsubmission_genaiuse');
+                } else if (
+                    $toolusemethod === 'text'
+                    && $this->is_editor_content_empty($values['genaiuse_tooluse_editor'] ?? '')
+                ) {
+                    $errors['genaiuse_tooluse_editor'] =
+                        get_string('tooluse_text_required', 'assignsubmission_genaiuse');
+                } else if (
+                    $toolusemethod === 'upload'
+                    && $this->count_draft_files($values['genaiuse_tooluse_filemanager'] ?? 0) < 1
+                ) {
+                    $errors['genaiuse_tooluse_filemanager'] =
+                        get_string('tooluse_upload_required', 'assignsubmission_genaiuse');
                 }
             }
             if ($aiused !== '') {

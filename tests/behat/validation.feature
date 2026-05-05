@@ -64,6 +64,41 @@ Feature: Form validation for the Generative AI use statement
     And I should not see "Generative AI was used"
 
   @javascript
+  Scenario: Enter text method requires non-empty tool use editor content
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
+    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
+    And I set the field "genaiuse_ack_confirmed" to "1"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "   "
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "Please enter tool use details." in the "#id_error_genaiuse_tooluse_editor" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: Upload document method requires at least one uploaded tool use file
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
+    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
+    And I set the field "genaiuse_ack_confirmed" to "1"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Upload document']" "xpath_element"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No, I do not have supporting evidence']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "Please upload at least one tool use document." in the "#id_error_genaiuse_tooluse_filemanager" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
   Scenario: Acknowledgement field is not shown when no acknowledgement content is configured
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
