@@ -12,6 +12,10 @@ An assignment submission plugin for Moodle that requires students to declare whe
   - Description of AI-generated content
   - How the content was modified
 - Optional file upload for supporting evidence (e.g. chat logs, screenshots).
+- Optional OneDrive link workflow (when enabled per assignment):
+  - Students answer whether they have a OneDrive link
+  - Students can paste a OneDrive link to their final submission
+  - Optional guidance link can be shown to help students create a OneDrive share link
 - Teachers can view AI use declarations on the grading page.
 
 ## Requirements
@@ -31,8 +35,27 @@ Site-level settings are available under **Site administration > Plugins > Assign
 - **Enabled by default** - Whether the plugin is enabled by default for new assignments.
 - **Maximum number of evidence files** - Maximum number of evidence files a student can upload (1-20, default 5).
 - **Maximum file size** - Maximum size for each evidence file upload.
+- **OneDrive assistance** - Optional URL shown to students as "How to create a OneDrive link".
+- **OneDrive recommendation** - Optional rich-text recommendation shown on the assignment view page when OneDrive is enabled.
 
-Per-assignment settings are available when editing an assignment under the **Submission types** section.
+Per-assignment settings are available when editing an assignment under the **Submission types** section, including:
+
+- Enabling/disabling this submission plugin for the assignment
+- Enabling/disabling the OneDrive link field for that assignment
+
+## Screenshots
+
+### Submission screen example (Snap theme)
+
+![Submission screen example](<docs/images/Submission screen example - 2026-05-08_05-51-55.png>)
+
+### Completed example - AI Used
+
+![Completed example - AI Used](<docs/images/Completed example - AI Used - 2026-05-08_06-59-38.png>)
+
+### Completed example - No AI Used
+
+![Completed example No AI Used](<docs/images/Completed example - No AI Used - 2026-05-08_06-54-01.png>)
 
 ## License
 
@@ -41,3 +64,7 @@ This plugin is licensed under the [GNU GPL v3 or later](https://www.gnu.org/copy
 ## Author
 
 Andrew Rowatt <A.J.Rowatt@massey.ac.nz>
+
+## Screenshots
+### Completed example - AI Used
+![Completed example - AI Used](<docs/images/Completed example - AI Used - 2026-05-08_06-59-38.png>)
