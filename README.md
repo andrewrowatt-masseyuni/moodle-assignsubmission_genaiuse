@@ -64,7 +64,3 @@ This plugin is licensed under the [GNU GPL v3 or later](https://www.gnu.org/copy
 ## Author
 
 Andrew Rowatt <A.J.Rowatt@massey.ac.nz>
-
-## Screenshots
-### Completed example - AI Used
-![Completed example - AI Used](<docs/images/Completed example - AI Used - 2026-05-08_06-59-38.png>)
