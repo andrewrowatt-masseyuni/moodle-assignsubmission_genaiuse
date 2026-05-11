@@ -1,0 +1,110 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template assignsubmission_genaiuse/view_staff
+
+    Renders the submission summary for the staff-facing grading view. Shares
+    the card aesthetic of assignsubmission_genaiuse/view_student but uses
+    tighter spacing and a shorter scrollable tool-use box to fit the narrow
+    grading column.
+
+    Context variables required for this template are identical to
+    assignsubmission_genaiuse/view_student. See that template for the full list.
+}}
+<div class="submission_genaiuse submission_genaiuse_view submission_genaiuse_view_staff">
+    <div class="card submission_genaiuse_card mb-2">
+        <div class="card-header submission_genaiuse_cardheader">
+            <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{declarationtitle}}</h4>
+        </div>
+        <div class="card-body">
+            {{#aiused}}
+                <dl class="genaiuse_view_dl">
+                    <dt>{{label_tools}}:</dt>
+                    <dd>{{aitoolsused}}</dd>
+                    <dt>{{label_context}}:</dt>
+                    <dd>{{aiusecontext}}</dd>
+                    <dt>{{label_content}}:</dt>
+                    <dd>{{aicontentdesc}}</dd>
+                    <dt>{{label_modification}}:</dt>
+                    <dd>{{aimodification}}</dd>
+                </dl>
+            {{/aiused}}
+            {{^aiused}}
+                <p class="mb-0">{{noaiusedtext}}</p>
+            {{/aiused}}
+        </div>
+    </div>
+
+    {{#aiused}}
+        <div class="card submission_genaiuse_card mb-2 genaiuse_tooluse_popout_wrapper">
+            <div class="card-header submission_genaiuse_cardheader d-flex justify-content-between align-items-top">
+                <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{tooluseheading}}</h4>
+                {{#hastooluse}}
+                    <a href="#" class="genaiuse_tooluse_popout_button"
+                       data-region="genaiuse-tooluse-popout"
+                       aria-label="{{#str}}togglezoom, mod_assign{{/str}}"
+                       title="{{#str}}togglezoom, mod_assign{{/str}}">
+                        {{#pix}}e/fullscreen, core{{/pix}}
+                    </a>
+                {{/hastooluse}}
+            </div>
+            <div class="card-body">
+                {{#hastooluse}}
+                    <div class="genaiuse_tooluse_text genaiuse_tooluse_text_compact">{{{tooluseformatted}}}</div>
+                {{/hastooluse}}
+                {{{toolusefiles}}}
+            </div>
+        </div>
+        {{#hastooluse}}
+            {{#js}}
+                require(['assignsubmission_genaiuse/tooluse_popout'], function(Popout) {
+                    Popout.init();
+                });
+            {{/js}}
+        {{/hastooluse}}
+    {{/aiused}}
+
+    <div class="card submission_genaiuse_card mb-2">
+        <div class="card-header submission_genaiuse_cardheader">
+            <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{supportingevidenceheading}}</h4>
+        </div>
+        <div class="card-body">
+            {{#hasevidencefiles}}
+                {{{evidencefiles}}}
+            {{/hasevidencefiles}}
+            {{^hasevidencefiles}}
+                <p class="mb-0">{{evidencechoicelabel}}</p>
+            {{/hasevidencefiles}}
+        </div>
+    </div>
+
+    {{#hasonedrivesection}}
+        <div class="card submission_genaiuse_card mb-2">
+            <div class="card-header submission_genaiuse_cardheader">
+                <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{onedriveheading}}</h4>
+            </div>
+            <div class="card-body">
+                {{#hasonedrivechoice}}
+                    <p {{^hasonedrivelink}}class="mb-0"{{/hasonedrivelink}}>{{onedrivechoicelabel}}</p>
+                {{/hasonedrivechoice}}
+                {{#hasonedrivelink}}
+                    <p class="mb-0">{{{onedrivelinkhtml}}}</p>
+                {{/hasonedrivelink}}
+            </div>
+        </div>
+    {{/hasonedrivesection}}
+</div>

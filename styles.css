@@ -26,16 +26,19 @@
     margin-bottom: 0.75rem;
 }
 
-.mform .submission_genaiuse_card {
+.mform .submission_genaiuse_card,
+.submission_genaiuse_view .submission_genaiuse_card {
     margin-left: 0.5rem;
 }
 
-.mform .submission_genaiuse_card > .submission_genaiuse_cardheader {
+.mform .submission_genaiuse_card > .submission_genaiuse_cardheader,
+.submission_genaiuse_view .submission_genaiuse_card > .submission_genaiuse_cardheader {
     background-color: rgba(0, 0, 0, 0.03);
     padding: 0.5rem 1rem;
 }
 
-.mform .submission_genaiuse_cardtitle {
+.mform .submission_genaiuse_cardtitle,
+.submission_genaiuse_view .submission_genaiuse_cardtitle {
     font-size: 1rem;
     font-weight: 500;
     margin-bottom: 0;
@@ -246,6 +249,104 @@
     overflow: scroll auto;
     border: 1px solid rgba(0, 0, 0, 0.125);
     padding: 0.5rem;
+}
+
+.genaiuse_tooluse_text.genaiuse_tooluse_text_compact {
+    max-height: 12em;
+}
+
+/* Popout/fullscreen control for the read-only Tool use card.
+   Button lives in the card header; clicking expands the entire card to
+   cover most of the viewport. */
+.genaiuse_tooluse_popout_button {
+    line-height: 1;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.55);
+    flex-shrink: 0;
+
+    i.icon {
+        margin: 0 0 0 0.5rem;
+    }
+}
+
+.genaiuse_tooluse_popout_button:hover,
+.genaiuse_tooluse_popout_button:focus {
+    color: rgba(0, 0, 0, 0.85);
+    text-decoration: none;
+}
+
+.genaiuse_tooluse_popout_wrapper.popout {
+    position: fixed;
+    left: 10%;
+    right: 10%;
+    top: 10%;
+    bottom: 10%;
+    z-index: 1000;
+    margin: 0;
+    overflow: auto;
+    background-color: #fff;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.genaiuse_tooluse_popout_wrapper.popout > .card-body {
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+.genaiuse_tooluse_popout_wrapper.popout .genaiuse_tooluse_text {
+    max-height: none;
+}
+
+/* Shared definition-list used in the student view declaration card.
+   Tight label-to-value gap, wider gap between successive pairs so each
+   dt/dd visually clusters as one unit. */
+.submission_genaiuse_view .genaiuse_view_dl {
+    margin: 0;
+}
+
+.submission_genaiuse_view .genaiuse_view_dl > dt {
+    font-weight: 500;
+    margin-top: 0.6rem;
+}
+
+.submission_genaiuse_view .genaiuse_view_dl > dt:first-child {
+    margin-top: 0;
+}
+
+.submission_genaiuse_view .genaiuse_view_dl > dd {
+    margin: 0;
+    word-break: break-word;
+}
+
+:where(.submission_genaiuse_view_staff, .submission_genaiuse_view) .fileuploadsubmissiontime {
+    display: none;
+}
+
+/* Compact staff (grading column) layout. Reuses the card aesthetic from the
+   student view but tightens spacing and type to fit the narrow grading column. */
+.submission_genaiuse_view_staff .submission_genaiuse_card {
+    margin-left: 0;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.submission_genaiuse_view_staff .submission_genaiuse_card > .submission_genaiuse_cardheader {
+    padding: 0.25rem 0.5rem;
+}
+
+.submission_genaiuse_view_staff .submission_genaiuse_cardtitle {
+    font-size: 0.9rem;
+}
+
+.submission_genaiuse_view_staff .card-body {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.submission_genaiuse_view_staff .genaiuse_view_dl > dt {
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .path-mod-assign .assignsubmission_genaiuse {

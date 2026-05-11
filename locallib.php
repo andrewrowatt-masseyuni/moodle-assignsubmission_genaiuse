@@ -1038,122 +1038,115 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      * @return string
      */
     public function view(stdClass $submission) {
-        global $DB;
+        global $OUTPUT;
 
         $record = $this->get_genaiuse_submission($submission->id);
         if (!$record) {
             return '';
         }
 
-        $user = core_user::get_user($submission->userid);
-        if (!$user) {
-            return '';
-        }
-        $fullname = fullname($user);
-        $result = '';
+        $context = $this->build_view_context($record, $submission);
+        $isgradingview = has_capability('mod/assign:grade', $this->assignment->get_context());
+        $template = $isgradingview
+            ? 'assignsubmission_genaiuse/view_staff'
+            : 'assignsubmission_genaiuse/view_student';
 
-        $result .= \html_writer::tag(
-            'h4',
-            get_string('genaiuse_declaration', 'assignsubmission_genaiuse')
-        );
+        return $OUTPUT->render_from_template($template, $context);
+    }
 
-        if ($record->aiused == ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED) {
-            $result .= \html_writer::tag(
-                'p',
-                get_string('noaiused', 'assignsubmission_genaiuse')
-            );
-        } else {
-            $result .= \html_writer::tag(
-                'p',
-                get_string('aiused', 'assignsubmission_genaiuse')
-            );
-            $result .= \html_writer::tag(
-                'i',
-                get_string('ai_placeholder_tools', 'assignsubmission_genaiuse')
-            );
-            $result .= \html_writer::tag(
-                'p',
-                s($record->aitoolsused)
-            );
+    /**
+     * Build the shared template context consumed by both view_student and view_staff templates.
+     *
+     * @param stdClass $record The assignsubmission_genaiuse record for the submission.
+     * @param stdClass $submission The submission record.
+     * @return array Template context.
+     */
+    private function build_view_context(stdClass $record, stdClass $submission): array {
+        $aiused = $record->aiused == ASSIGNSUBMISSION_GENAIUSE_AI_USED;
 
-            $result .= \html_writer::tag(
-                'i',
-                get_string('ai_placeholder_context', 'assignsubmission_genaiuse')
-            );
-            $result .= \html_writer::tag(
-                'p',
-                s($record->aiusecontext)
-            );
-
-            $result .= \html_writer::tag(
-                'i',
-                get_string('ai_placeholder_content', 'assignsubmission_genaiuse')
-            );
-            $result .= \html_writer::tag(
-                'p',
-                s($record->aicontentdesc)
-            );
-
-            $result .= \html_writer::tag(
-                'i',
-                get_string('ai_placeholder_modification', 'assignsubmission_genaiuse')
-            );
-            $result .= \html_writer::tag(
-                'p',
-                s($record->aimodification)
-            );
-
-            $result .= \html_writer::tag('h4', get_string('tooluse_heading', 'assignsubmission_genaiuse'));
-
-            // Tool use richtext field.
-            if (!empty($record->tooluse)) {
-                $result .= \html_writer::tag(
-                    'div',
-                    format_text($record->tooluse, FORMAT_HTML),
-                    ['class' => 'genaiuse_tooluse_text']
-                );
-            }
-
-            $result .= $this->assignment->render_area_files(
+        $context = [
+            'aiused' => $aiused,
+            'aitoolsused' => s($record->aitoolsused),
+            'aiusecontext' => s($record->aiusecontext),
+            'aicontentdesc' => s($record->aicontentdesc),
+            'aimodification' => s($record->aimodification),
+            'declarationtitle' => get_string('genaiuse_declaration', 'assignsubmission_genaiuse'),
+            'noaiusedtext' => get_string('noaiused', 'assignsubmission_genaiuse'),
+            'label_tools' => get_string('ai_tools_used_label', 'assignsubmission_genaiuse'),
+            'label_context' => get_string('ai_use_context_label', 'assignsubmission_genaiuse'),
+            'label_content' => get_string('ai_content_desc_label', 'assignsubmission_genaiuse'),
+            'label_modification' => get_string('ai_modification_label', 'assignsubmission_genaiuse'),
+            'tooluseheading' => get_string('tooluse_heading', 'assignsubmission_genaiuse'),
+            'hastooluse' => !empty($record->tooluse),
+            'tooluseformatted' => !empty($record->tooluse) ? format_text($record->tooluse, FORMAT_HTML) : '',
+            'toolusefiles' => $aiused ? $this->assignment->render_area_files(
                 'assignsubmission_genaiuse',
                 ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+                $submission->id
+            ) : '',
+            'supportingevidenceheading' => get_string('supportingevidence', 'assignsubmission_genaiuse'),
+            'evidencechoicelabel' => $this->get_evidence_choice_label($record->evidencechoice),
+            'hasevidencefiles' => ($record->evidencechoice === 'yes' && $record->numfiles > 0),
+            'evidencefiles' => '',
+        ];
+
+        if ($context['hasevidencefiles']) {
+            $context['evidencefiles'] = $this->assignment->render_area_files(
+                'assignsubmission_genaiuse',
+                ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
                 $submission->id
             );
         }
 
-        $result .= \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'));
-        $result .= \html_writer::tag(
-            'p',
-            get_string($record->evidencechoice)
-        );
+        $hasonedrivesection = !empty($record->onedrivelinkchoice) || !empty($record->onedrivelink);
+        $context['hasonedrivesection'] = $hasonedrivesection;
+        $context['onedriveheading'] = get_string('onedrive', 'assignsubmission_genaiuse');
+        $context['hasonedrivechoice'] = !empty($record->onedrivelinkchoice);
+        $context['onedrivechoicelabel'] = !empty($record->onedrivelinkchoice)
+            ? $this->get_onedrive_choice_label($record->onedrivelinkchoice)
+            : '';
+        $context['hasonedrivelink'] = !empty($record->onedrivelink);
+        $context['onedrivelinkhtml'] = !empty($record->onedrivelink)
+            ? \html_writer::link(
+                $record->onedrivelink,
+                get_string('onedrivelinktext', 'assignsubmission_genaiuse'),
+                ['target' => '_blank', 'rel' => 'noopener noreferrer']
+            )
+            : '';
 
-        if ($record->evidencechoice == 'yes') {
-            if ($record->numfiles > 0) {
-                $result .= $this->assignment->render_area_files(
-                    'assignsubmission_genaiuse',
-                    ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
-                    $submission->id
-                );
-            }
+        return $context;
+    }
+
+    /**
+     * Map an evidencechoice value ('yes'/'no'/empty) to a friendly display label.
+     *
+     * @param string|null $choice Evidence choice value.
+     * @return string Display label.
+     */
+    private function get_evidence_choice_label(?string $choice): string {
+        if ($choice === 'yes') {
+            return get_string('supportingevidence_yes_title', 'assignsubmission_genaiuse');
         }
-
-        if (!empty($record->onedrivelinkchoice) || !empty($record->onedrivelink)) {
-            $result .= \html_writer::tag('h4', get_string('onedrive', 'assignsubmission_genaiuse'));
-            if (!empty($record->onedrivelinkchoice)) {
-                $result .= \html_writer::tag(
-                    'p',
-                    get_string($record->onedrivelinkchoice)
-                );
-            }
-            if (!empty($record->onedrivelink)) {
-                $result .= \html_writer::tag(
-                    'p',
-                    \html_writer::link($record->onedrivelink, get_string('onedrivelinktext', 'assignsubmission_genaiuse'), ['target' => '_blank'])
-                );
-            }
+        if ($choice === 'no') {
+            return get_string('supportingevidence_no_title', 'assignsubmission_genaiuse');
         }
+        return '';
+    }
 
-        return $result;
+    /**
+     * Map an onedrivelinkchoice value ('yes'/'no'/empty) to a friendly display label.
+     *
+     * @param string|null $choice OneDrive link choice value.
+     * @return string Display label.
+     */
+    private function get_onedrive_choice_label(?string $choice): string {
+        if ($choice === 'yes') {
+            return get_string('onedrivelink_yes_title', 'assignsubmission_genaiuse');
+        }
+        if ($choice === 'no') {
+            return get_string('onedrivelink_no_title', 'assignsubmission_genaiuse');
+        }
+        return '';
     }
 
     /**
