@@ -242,5 +242,21 @@
 
 
 .genaiuse_tooluse_text {
-    border: 1px solid red;
+    max-height: 20em;
+    overflow: scroll auto;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 0.5rem;
+}
+
+.path-mod-assign .assignsubmission_genaiuse {
+    font-size: 90%;
+
+    h4 {
+        font-size: 18px;
+        font-weight: 400;
+    }
+
+    p {
+        font-weight: 300;
+    }
 }

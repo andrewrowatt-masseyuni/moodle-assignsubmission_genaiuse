@@ -1124,7 +1124,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $result .= \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'));
         $result .= \html_writer::tag(
             'p',
-            \html_writer::tag('strong', get_string($record->evidencechoice))
+            get_string($record->evidencechoice)
         );
 
         if ($record->evidencechoice == 'yes') {
@@ -1142,13 +1142,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             if (!empty($record->onedrivelinkchoice)) {
                 $result .= \html_writer::tag(
                     'p',
-                    \html_writer::tag('strong', get_string($record->onedrivelinkchoice))
+                    get_string($record->onedrivelinkchoice)
                 );
             }
             if (!empty($record->onedrivelink)) {
                 $result .= \html_writer::tag(
                     'p',
-                    \html_writer::link($record->onedrivelink, s($record->onedrivelink), ['target' => '_blank'])
+                    \html_writer::link($record->onedrivelink, get_string('onedrivelinktext', 'assignsubmission_genaiuse'), ['target' => '_blank'])
                 );
             }
         }

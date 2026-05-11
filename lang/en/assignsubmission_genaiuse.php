@@ -89,6 +89,7 @@ $string['onedrivelink_no_helper'] = 'I have no OneDrive link to provide.';
 $string['onedrivelink_no_title'] = 'No, I do not have a OneDrive link';
 $string['onedrivelink_yes_helper'] = 'Paste a OneDrive link to the final copy of your assignment.';
 $string['onedrivelink_yes_title'] = 'Yes, I have a OneDrive link';
+$string['onedrivelinktext'] = 'OneDrive link (opens in new window)';
 $string['onedriverecommendation'] = 'OneDrive recommendation';
 $string['onedriverecommendation_help'] = 'Recommendation shown to students on the assignment view page when OneDrive link is enabled for an assignment.';
 $string['pluginname'] = 'Generative AI use statement';
