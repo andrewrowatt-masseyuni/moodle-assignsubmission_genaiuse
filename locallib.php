@@ -1070,13 +1070,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'aiusecontext' => s($record->aiusecontext),
             'aicontentdesc' => s($record->aicontentdesc),
             'aimodification' => s($record->aimodification),
-            'declarationtitle' => get_string('genaiuse_declaration', 'assignsubmission_genaiuse'),
-            'noaiusedtext' => get_string('noaiused', 'assignsubmission_genaiuse'),
-            'label_tools' => get_string('ai_tools_used_label', 'assignsubmission_genaiuse'),
-            'label_context' => get_string('ai_use_context_label', 'assignsubmission_genaiuse'),
-            'label_content' => get_string('ai_content_desc_label', 'assignsubmission_genaiuse'),
-            'label_modification' => get_string('ai_modification_label', 'assignsubmission_genaiuse'),
-            'tooluseheading' => get_string('tooluse_heading', 'assignsubmission_genaiuse'),
             'hastooluse' => !empty($record->tooluse),
             'tooluseformatted' => !empty($record->tooluse) ? format_text($record->tooluse, FORMAT_HTML) : '',
             'toolusefiles' => $aiused ? $this->assignment->render_area_files(
@@ -1084,8 +1077,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
                 $submission->id
             ) : '',
-            'supportingevidenceheading' => get_string('supportingevidence', 'assignsubmission_genaiuse'),
-            'evidencechoicelabel' => $this->get_evidence_choice_label($record->evidencechoice),
+            'evidencechoiceyes' => ($record->evidencechoice === 'yes'),
+            'evidencechoiceno' => ($record->evidencechoice === 'no'),
             'hasevidencefiles' => ($record->evidencechoice === 'yes' && $record->numfiles > 0),
             'evidencefiles' => '',
         ];
@@ -1100,11 +1093,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $hasonedrivesection = !empty($record->onedrivelinkchoice) || !empty($record->onedrivelink);
         $context['hasonedrivesection'] = $hasonedrivesection;
-        $context['onedriveheading'] = get_string('onedrive', 'assignsubmission_genaiuse');
         $context['hasonedrivechoice'] = !empty($record->onedrivelinkchoice);
-        $context['onedrivechoicelabel'] = !empty($record->onedrivelinkchoice)
-            ? $this->get_onedrive_choice_label($record->onedrivelinkchoice)
-            : '';
+        $context['onedrivechoiceyes'] = ($record->onedrivelinkchoice === 'yes');
+        $context['onedrivechoiceno'] = ($record->onedrivelinkchoice === 'no');
         $context['hasonedrivelink'] = !empty($record->onedrivelink);
         $context['onedrivelinkhtml'] = !empty($record->onedrivelink)
             ? \html_writer::link(
@@ -1115,38 +1106,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             : '';
 
         return $context;
-    }
-
-    /**
-     * Map an evidencechoice value ('yes'/'no'/empty) to a friendly display label.
-     *
-     * @param string|null $choice Evidence choice value.
-     * @return string Display label.
-     */
-    private function get_evidence_choice_label(?string $choice): string {
-        if ($choice === 'yes') {
-            return get_string('supportingevidence_yes_title', 'assignsubmission_genaiuse');
-        }
-        if ($choice === 'no') {
-            return get_string('supportingevidence_no_title', 'assignsubmission_genaiuse');
-        }
-        return '';
-    }
-
-    /**
-     * Map an onedrivelinkchoice value ('yes'/'no'/empty) to a friendly display label.
-     *
-     * @param string|null $choice OneDrive link choice value.
-     * @return string Display label.
-     */
-    private function get_onedrive_choice_label(?string $choice): string {
-        if ($choice === 'yes') {
-            return get_string('onedrivelink_yes_title', 'assignsubmission_genaiuse');
-        }
-        if ($choice === 'no') {
-            return get_string('onedrivelink_no_title', 'assignsubmission_genaiuse');
-        }
-        return '';
     }
 
     /**

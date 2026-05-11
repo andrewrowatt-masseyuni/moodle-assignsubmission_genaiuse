@@ -24,27 +24,49 @@
 
     Context variables required for this template are identical to
     assignsubmission_genaiuse/view_student. See that template for the full list.
+
+    Example context (json):
+    {
+        "aiused": true,
+        "aitoolsused": "ChatGPT (https://chat.openai.com)",
+        "aiusecontext": "brainstorming ideas and generating draft text",
+        "aicontentdesc": "an outline structure and sample paragraphs",
+        "aimodification": "rewrote key sections and verified facts",
+        "hastooluse": true,
+        "tooluseformatted": "<p>Tool use details...</p>",
+        "toolusefiles": "",
+        "hasevidencefiles": false,
+        "evidencefiles": "",
+        "evidencechoiceyes": true,
+        "evidencechoiceno": false,
+        "hasonedrivesection": true,
+        "hasonedrivechoice": true,
+        "onedrivechoiceyes": true,
+        "onedrivechoiceno": false,
+        "hasonedrivelink": true,
+        "onedrivelinkhtml": "<a href=\"https://example.com/onedrive\" target=\"_blank\">OneDrive link (opens in new window)</a>"
+    }
 }}
 <div class="submission_genaiuse submission_genaiuse_view submission_genaiuse_view_staff">
     <div class="card submission_genaiuse_card mb-2">
         <div class="card-header submission_genaiuse_cardheader">
-            <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{declarationtitle}}</h4>
+            <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{#str}}genaiuse_declaration, assignsubmission_genaiuse{{/str}}</h4>
         </div>
         <div class="card-body">
             {{#aiused}}
                 <dl class="genaiuse_view_dl">
-                    <dt>{{label_tools}}:</dt>
+                    <dt>{{#str}}ai_tools_used_label, assignsubmission_genaiuse{{/str}}:</dt>
                     <dd>{{aitoolsused}}</dd>
-                    <dt>{{label_context}}:</dt>
+                    <dt>{{#str}}ai_use_context_label, assignsubmission_genaiuse{{/str}}:</dt>
                     <dd>{{aiusecontext}}</dd>
-                    <dt>{{label_content}}:</dt>
+                    <dt>{{#str}}ai_content_desc_label, assignsubmission_genaiuse{{/str}}:</dt>
                     <dd>{{aicontentdesc}}</dd>
-                    <dt>{{label_modification}}:</dt>
+                    <dt>{{#str}}ai_modification_label, assignsubmission_genaiuse{{/str}}:</dt>
                     <dd>{{aimodification}}</dd>
                 </dl>
             {{/aiused}}
             {{^aiused}}
-                <p class="mb-0">{{noaiusedtext}}</p>
+                <p class="mb-0">{{#str}}noaiused, assignsubmission_genaiuse{{/str}}</p>
             {{/aiused}}
         </div>
     </div>
@@ -52,7 +74,7 @@
     {{#aiused}}
         <div class="card submission_genaiuse_card mb-2 genaiuse_tooluse_popout_wrapper">
             <div class="card-header submission_genaiuse_cardheader d-flex justify-content-between align-items-top">
-                <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{tooluseheading}}</h4>
+                <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{#str}}tooluse_heading, assignsubmission_genaiuse{{/str}}</h4>
                 {{#hastooluse}}
                     <a href="#" class="genaiuse_tooluse_popout_button"
                        data-region="genaiuse-tooluse-popout"
@@ -80,14 +102,17 @@
 
     <div class="card submission_genaiuse_card mb-2">
         <div class="card-header submission_genaiuse_cardheader">
-            <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{supportingevidenceheading}}</h4>
+            <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{#str}}supportingevidence, assignsubmission_genaiuse{{/str}}</h4>
         </div>
         <div class="card-body">
             {{#hasevidencefiles}}
                 {{{evidencefiles}}}
             {{/hasevidencefiles}}
             {{^hasevidencefiles}}
-                <p class="mb-0">{{evidencechoicelabel}}</p>
+                <p class="mb-0">
+                    {{#evidencechoiceyes}}{{#str}}supportingevidence_yes_title, assignsubmission_genaiuse{{/str}}{{/evidencechoiceyes}}
+                    {{#evidencechoiceno}}{{#str}}supportingevidence_no_title, assignsubmission_genaiuse{{/str}}{{/evidencechoiceno}}
+                </p>
             {{/hasevidencefiles}}
         </div>
     </div>
@@ -95,11 +120,14 @@
     {{#hasonedrivesection}}
         <div class="card submission_genaiuse_card mb-2">
             <div class="card-header submission_genaiuse_cardheader">
-                <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{onedriveheading}}</h4>
+                <h4 class="submission_genaiuse_cardtitle h6 mb-0">{{#str}}onedrive, assignsubmission_genaiuse{{/str}}</h4>
             </div>
             <div class="card-body">
                 {{#hasonedrivechoice}}
-                    <p {{^hasonedrivelink}}class="mb-0"{{/hasonedrivelink}}>{{onedrivechoicelabel}}</p>
+                    <p {{^hasonedrivelink}}class="mb-0"{{/hasonedrivelink}}>
+                        {{#onedrivechoiceyes}}{{#str}}onedrivelink_yes_title, assignsubmission_genaiuse{{/str}}{{/onedrivechoiceyes}}
+                        {{#onedrivechoiceno}}{{#str}}onedrivelink_no_title, assignsubmission_genaiuse{{/str}}{{/onedrivechoiceno}}
+                    </p>
                 {{/hasonedrivechoice}}
                 {{#hasonedrivelink}}
                     <p class="mb-0">{{{onedrivelinkhtml}}}</p>
