@@ -57,6 +57,16 @@ Per-assignment settings are available when editing an assignment under the **Sub
 
 ![Completed example No AI Used](<docs/images/Completed example - No AI Used - 2026-05-08_06-54-01.png>)
 
+
+### Staff view - grading - sample
+![Staff view - grading - sample](<docs/images/Staff view - grading - 2026-05-12_17-45-33.png>)
+
+### Staff view - grading - sample with tool use popout
+![Staff view - grading - sample with tool use popout](<docs/images/Staff view - grading - popout - 2026-05-12_22-11-45.png>)
+
+### Student view - post-submission
+![Student view - post-submission](<docs/images/Student view - post-submission - sample - 2026-05-12_17-52-27.png>)
+
 ## License
 
 This plugin is licensed under the [GNU GPL v3 or later](https://www.gnu.org/copyleft/gpl.html).
