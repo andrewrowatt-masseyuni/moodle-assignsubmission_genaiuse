@@ -247,8 +247,6 @@
 .genaiuse_tooluse_text {
     max-height: 20em;
     overflow: scroll auto;
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    padding: 0.5rem;
 }
 
 .genaiuse_tooluse_text.genaiuse_tooluse_text_compact {
@@ -320,8 +318,15 @@
     word-break: break-word;
 }
 
-:where(.submission_genaiuse_view_staff, .submission_genaiuse_view) .fileuploadsubmissiontime {
-    display: none;
+:where(.submission_genaiuse_view_staff, .submission_genaiuse_view) {
+    table:has(.fileuploadsubmissiontime) {
+        tbody tr:nth-of-type(odd) {
+            background-color: transparent;
+        }
+    }
+    .fileuploadsubmissiontime {
+        display: none;
+    }
 }
 
 /* Compact staff (grading column) layout. Reuses the card aesthetic from the
