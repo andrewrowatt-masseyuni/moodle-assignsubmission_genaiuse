@@ -29,6 +29,40 @@ Feature: OneDrive link submission field for Generative AI use statement
     Then I should not see "OneDrive link"
 
   @javascript
+  Scenario: OneDrive recommendation is hidden on the assign view page when the sub-feature is disabled
+    Given the following config values are set as admin:
+      | onedriverecommendation | <p>Please use OneDrive for your drafts.</p> | assignsubmission_genaiuse |
+    And the following "activity" exists:
+      | activity                            | assign             |
+      | course                              | C1                 |
+      | name                                | No OneDrive assign |
+      | submissiondrafts                    | 0                  |
+      | assignsubmission_genaiuse_enabled   | 1                  |
+      | assignsubmission_onlinetext_enabled | 1                  |
+    When I am on the "No OneDrive assign" Activity page logged in as student1
+    Then I should not see "Please use OneDrive for your drafts."
+
+  @javascript
+  Scenario: OneDrive choice is required when the OneDrive sub-feature is enabled
+    Given the following "activity" exists:
+      | activity                                | assign                |
+      | course                                  | C1                    |
+      | name                                    | OneDrive assign       |
+      | submissiondrafts                        | 0                     |
+      | assignsubmission_genaiuse_enabled       | 1                     |
+      | assignsubmission_genaiuse_onedrivelink  | 1                     |
+      | assignsubmission_onlinetext_enabled     | 1                     |
+    And I am on the "OneDrive assign" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My original submission."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
+    And I set the field "genaiuse_ack_confirmed" to "1"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No supporting evidence supplied']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "Please choose whether you have a OneDrive link to provide." in the "#fgroup_id_error_genaiuse_onedrivelink_choice_group" "css_element"
+    And I should not see "No generative AI was used"
+
+  @javascript
   Scenario: Student sees the OneDrive link field and recommendation when enabled
     Given the following config values are set as admin:
       | onedriveassistance     | https://support.microsoft.com/onedrive        | assignsubmission_genaiuse |

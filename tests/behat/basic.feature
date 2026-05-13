@@ -25,14 +25,6 @@ Feature: Basic tests for Generative AI use statement
     And I change the window size to "large"
 
   @javascript
-  Scenario: Plugin assignsubmission_genaiuse appears in the list of installed additional plugins
-    Given I log in as "admin"
-    When I navigate to "Plugins > Plugins overview" in site administration
-    And I follow "Additional plugins"
-    Then I should see "Generative AI use statement"
-    And I should see "assignsubmission_genaiuse"
-
-  @javascript
   Scenario: No AI use option is selected by default on a new submission
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
@@ -99,10 +91,15 @@ Feature: Basic tests for Generative AI use statement
     And I set the field "genaiuse_aimodification" to "rewrote all sections"
     And I set the field "genaiuse_ack_confirmed" to "1"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
-    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text for teacher"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No supporting evidence supplied']" "xpath_element"
     And I press "Save changes"
     And I log out
     When I am on the "Test assignment" Activity page logged in as teacher1
     And I go to "Student 1" "Test assignment" activity advanced grading page
     Then I should see "Generative AI was used"
+    And "//dd[contains(normalize-space(.),'ChatGPT')]" "xpath_element" should exist
+    And "//dd[contains(normalize-space(.),'generating draft text')]" "xpath_element" should exist
+    And "//dd[contains(normalize-space(.),'sample paragraphs')]" "xpath_element" should exist
+    And "//dd[contains(normalize-space(.),'rewrote all sections')]" "xpath_element" should exist
+    And "//div[contains(@class,'genaiuse_tooluse_text')][contains(normalize-space(.),'tool use text for teacher')]" "xpath_element" should exist

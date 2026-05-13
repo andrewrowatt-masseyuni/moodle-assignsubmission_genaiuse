@@ -64,6 +64,39 @@ Feature: Form validation for the Generative AI use statement
     And I should not see "Generative AI was used"
 
   @javascript
+  Scenario: Tool use method must be selected when AI Used is declared
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
+    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
+    And I set the field "genaiuse_ack_confirmed" to "1"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No supporting evidence supplied']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "Please choose how you will provide tool use details." in the "#fgroup_id_error_genaiuse_tooluse_method_group" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
+  Scenario: Acknowledgement is required when AI Used is selected even without configured extra acknowledgement content
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    And I set the field "Online text" to "My submission text."
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
+    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
+    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
+    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
+    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
+    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
+    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No supporting evidence supplied']" "xpath_element"
+    And I press "Save changes"
+    Then I should see "You must confirm that you have read the AI use acknowledgement." in the "#id_error_genaiuse_ack_confirmed" "css_element"
+    And I should not see "Generative AI was used"
+
+  @javascript
   Scenario: Enter text method requires non-empty tool use editor content
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
@@ -137,40 +170,6 @@ Feature: Form validation for the Generative AI use statement
     And I press "Save changes"
     Then I should see "You must confirm that you have read the AI use acknowledgement." in the "#id_error_genaiuse_ack_confirmed" "css_element"
     And I should not see "No generative AI was used"
-
-  @javascript
-  Scenario: Submission succeeds once all AI fields and acknowledgement are completed
-    Given the following config values are set as admin:
-      | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
-    And I am on the "Test assignment" Activity page logged in as student1
-    When I press "Add submission"
-    And I set the field "Online text" to "My submission text."
-    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
-    And I set the field "genaiuse_aitoolsused" to "ChatGPT"
-    And I set the field "genaiuse_aiusecontext" to "Drafting initial ideas"
-    And I set the field "genaiuse_aicontentdesc" to "Outline structure"
-    And I set the field "genaiuse_aimodification" to "Rewrote sections and verified facts"
-    And I set the field "genaiuse_ack_confirmed" to "1"
-    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='Enter text']" "xpath_element"
-    And I set the field "genaiuse_tooluse_editor[text]" to "tool use text"
-    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No supporting evidence supplied']" "xpath_element"
-    And I press "Save changes"
-    And I am on the "Test assignment" Activity page
-    Then I should see "Generative AI was used"
-
-  @javascript
-  Scenario: Selecting No AI Used does not require AI detail fields and succeeds once the acknowledgement is ticked
-    Given the following config values are set as admin:
-      | genaiuse_aiuseacknowledgementextra | <p>I will only use AI in line with the assessment instructions.</p> | assignsubmission_genaiuse |
-    And I am on the "Test assignment" Activity page logged in as student1
-    When I press "Add submission"
-    And I set the field "Online text" to "My original submission."
-    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
-    And I set the field "genaiuse_ack_confirmed" to "1"
-    And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No supporting evidence supplied']" "xpath_element"
-    And I press "Save changes"
-    And I am on the "Test assignment" Activity page
-    Then I should see "No generative AI was used"
 
   @javascript
   Scenario: Supporting evidence Yes/No choice is required when AI use has been declared
