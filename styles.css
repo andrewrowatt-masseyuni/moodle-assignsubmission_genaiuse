@@ -26,6 +26,30 @@
     margin-bottom: 0.75rem;
 }
 
+/* Page heading row — render full-width and left-aligned. Moodle's `static`
+   element does not propagate an attributes class to its wrapper, so the
+   `submission_genaiuse_full_row` shortcut isn't usable here; target the fitem
+   ID instead. Covers modern (.col-md-3/.col-md-9), legacy unclassed-div, and
+   bare-.felement markup variants. */
+.mform #fitem_id_genaiuse_heading1 {
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+.mform #fitem_id_genaiuse_heading1 > .col-md-3,
+.mform #fitem_id_genaiuse_heading1 > div:first-child:not([class]) {
+    display: none;
+}
+.mform #fitem_id_genaiuse_heading1 > .col-md-9,
+.mform #fitem_id_genaiuse_heading1 > .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .mform .submission_genaiuse_card,
 .submission_genaiuse_view .submission_genaiuse_card {
     margin-left: 0.5rem;
