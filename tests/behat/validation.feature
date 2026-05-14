@@ -136,9 +136,9 @@ Feature: Form validation for the Generative AI use statement
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
     And I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='AI Used']" "xpath_element"
-    Then I should not see "Read the AI use acknowledgement"
+    Then "#fitem_id_genaiuse_ai_ack_text" "css_element" should not exist
     When I click on "//div[@class='submission_genaiuse_radio_title'][normalize-space(.)='No AI Used']" "xpath_element"
-    Then I should not see "Read the AI use acknowledgement"
+    Then "#fitem_id_genaiuse_ai_ack_text" "css_element" should not exist
     And I should see "I have read the acknowledgement above and agree to it."
 
   @javascript

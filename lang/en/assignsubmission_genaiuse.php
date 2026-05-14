@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['ack_confirm'] = 'I have read the acknowledgement above and agree to it.';
 $string['ack_required'] = 'You must confirm that you have read the AI use acknowledgement.';
-$string['ack_summary'] = 'Read the AI use acknowledgement';
 $string['ai_content_desc_label'] = 'Content provided by AI';
 $string['ai_modification_label'] = 'How output was modified';
 $string['ai_placeholder_content'] = 'describe content used in task';

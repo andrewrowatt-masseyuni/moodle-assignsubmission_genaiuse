@@ -481,16 +481,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->disabledIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
         }
 
-        // Acknowledgement: collapsed <details> block as a top-level static element.
         $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
-        $hasack = (string)$ackcontent !== '';
-        if ($hasack) {
-            $detailshtml = '<details class="genaiuse_acknowledgement_details"><summary>'
-                . s(get_string('ack_summary', 'assignsubmission_genaiuse'))
-                . '</summary>'
-                . \html_writer::tag('div', $ackcontent, ['class' => 'genaiuse_acknowledgement'])
-                . '</details>';
-            $mform->addElement('static', 'genaiuse_ai_ack_text', '', $detailshtml);
+        if ((string)$ackcontent !== '') {
+            $mform->addElement('static', 'genaiuse_ai_ack_text', '', $ackcontent);
             $mform->hideIf('genaiuse_ai_ack_text', 'genaiuse_aiused', 'neq', $aiusedstr);
         }
 
@@ -500,7 +493,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'advcheckbox',
             'genaiuse_ack_confirmed',
             '',
-            get_string('ack_confirm', 'assignsubmission_genaiuse')
+            get_string('ack_confirm', 'assignsubmission_genaiuse'),
+            ['class' => 'submission_genaiuse_full_row']
         );
         $mform->setType('genaiuse_ack_confirmed', PARAM_INT);
         $mform->hideIf('genaiuse_ack_confirmed', 'genaiuse_aiused', 'eq', '');
@@ -879,6 +873,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         });
 
         $mform->addElement('html', '</div>'); // Close main plugin div.
+
+        global $PAGE;
+        $PAGE->requires->js_call_amd('assignsubmission_genaiuse/ackreset', 'init');
 
         return true;
     }

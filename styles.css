@@ -203,6 +203,78 @@
     font-weight: 500;
 }
 
+/* No-label row utility — apply by passing
+   ['class' => 'submission_genaiuse_full_row'] as the attributes argument on an
+   addElement() call. Hides the (empty) label column and aligns the content
+   column with the 75%/25% split used by the rest of the form on md+, falling
+   back to 100% width on narrow viewports. Handles every fitem variant the
+   plugin uses:
+   - modern markup: <.col-md-3> (empty label) + <.col-md-9 .felement> (content)
+   - legacy non-checkbox markup: unclassed <div> (label) + <div.felement> (content)
+   - legacy advcheckbox markup: <div.checkbox> only — no label column at all
+   The .fitem qualifier scopes the rule to the row wrapper, not the inner input
+   that the propagated class also lands on. */
+.mform .submission_genaiuse .submission_genaiuse_full_row.fitem {
+    display: block;
+}
+/* Hide empty label columns where they exist. :not([class]) avoids matching
+   legacy advcheckbox's <div class="checkbox"> (its only child). */
+.mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .col-md-3,
+.mform .submission_genaiuse .submission_genaiuse_full_row.fitem > div:first-child:not([class]) {
+    display: none;
+}
+.mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .col-md-9,
+.mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .felement,
+.mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .checkbox {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (min-width: 768px) {
+    .mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .col-md-9,
+    .mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .felement,
+    .mform .submission_genaiuse .submission_genaiuse_full_row.fitem > .checkbox {
+        flex: 0 0 75%;
+        max-width: 75%;
+        margin-left: 25%;
+    }
+}
+
+/* Required acknowledgement checkbox — render the wrapper that holds both the
+   checkbox and its label as a card so the "I have read…" action does not blend
+   into the surrounding rows. Default state is red-shaded to draw the eye;
+   checked state matches the selected radiocard (blue). The wrapper varies by
+   Moodle/theme version (modern .form-check, legacy advcheckbox .checkbox, and
+   plain .felement fallback) so the selectors find it via :has() on the input. */
+.mform .checkbox:has(> label > #id_genaiuse_ack_confirmed),
+.mform .form-check:has(> #id_genaiuse_ack_confirmed),
+.mform .felement:has(> #id_genaiuse_ack_confirmed) {
+    padding: 0.75rem 1rem;
+    border: 2px solid #dc3545;
+    border-radius: 0.5rem;
+    background-color: rgba(220, 53, 69, 0.08);
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.mform .checkbox:has(> label > #id_genaiuse_ack_confirmed:checked),
+.mform .form-check:has(> #id_genaiuse_ack_confirmed:checked),
+.mform .felement:has(> #id_genaiuse_ack_confirmed:checked) {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+    box-shadow: inset 0 0 0 1px #0d6efd;
+}
+
+.mform .checkbox:has(> label > #id_genaiuse_ack_confirmed) > label,
+.mform .form-check:has(> #id_genaiuse_ack_confirmed) > label,
+.mform .felement:has(> #id_genaiuse_ack_confirmed) > label {
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
 .mform .genaiuse_acknowledgement_details {
     width: 100%;
     margin: 0.5rem 0;
@@ -364,5 +436,79 @@
 
     p {
         font-weight: 300;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Legacy-Snap (pre-2025092400) compatibility: re-create the modern BS5
+   col-md-3 / col-md-9 form-group layout on top of the older form-group /
+   form-inline markup that older Snap (and pre-MDL-75670 Moodle) emits.
+   --------------------------------------------------------------------------- */
+
+/* Outer wrapper: turn the legacy form-group into a flex row on md+,
+   matching mb-3 row from the modern template. */
+.mform .submission_genaiuse .form-group.fitem:not(.submission_genaiuse_full_row) {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;  /* mimic mb-3 */
+}
+
+/* Label column: the unclassed first <div> that holds <label> + ✲. */
+.mform .submission_genaiuse .form-group.fitem:not(.submission_genaiuse_full_row) > div:first-child {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 0.75rem 0 0;
+}
+
+/* Content column: the .felement div that holds the actual field. */
+.mform .submission_genaiuse .form-group.fitem:not(.submission_genaiuse_full_row) > .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0;
+}
+
+@media (min-width: 768px) {
+    .mform .submission_genaiuse .form-group.fitem:not(.submission_genaiuse_full_row) > div:first-child {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+    .mform .submission_genaiuse .form-group.fitem:not(.submission_genaiuse_full_row) > .felement {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+}
+
+/* AI-detail fields keep the special "stack label above, indent 25% on md+"
+   layout. The existing rules (lines 159-200 of styles.css) target the modern
+   col-md-3/col-md-9 children; these mirror them for the legacy children. */
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aitoolsused,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aiusecontext,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aicontentdesc,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aimodification,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text {
+    display: block;
+}
+
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aitoolsused > div,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aiusecontext > div,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aicontentdesc > div,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aimodification > div,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text > div {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (min-width: 768px) {
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aitoolsused > div,
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aiusecontext > div,
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aicontentdesc > div,
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aimodification > div,
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text > div {
+        flex: 0 0 75%;
+        max-width: 75%;
+        margin-left: 25%;
     }
 }
